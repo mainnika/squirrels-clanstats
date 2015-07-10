@@ -33,9 +33,6 @@ public class Connection implements Runnable
 	private String host;
 	private int port;
 
-	private int expectation;
-	private ArrayList<Byte> dataBuffer;
-
 	private InputStream input;
 	private OutputStream output;
 
@@ -45,10 +42,9 @@ public class Connection implements Runnable
 		this.port = port;
 
 		this.semaphore = new Semaphore(0, true);
-		this.dataBuffer = new ArrayList<>();
 	}
 
-	private void connect() throws java.io.IOException
+	private void connect() throws IOException
 	{
 		InetSocketAddress addr = new InetSocketAddress(this.host, this.port);
 
@@ -61,56 +57,56 @@ public class Connection implements Runnable
 		log.info("Received data with size " + data.length);
 	}
 
-	private void handler() throws IOException
+	private void receiver() throws IOException
 	{
-		byte[] internalBuffer = new byte[bufferLen];
+		ArrayList<Byte> dataBuffer = new ArrayList<>(bufferLen);
+		byte[] rawBuffer = new byte[bufferLen];
+		int expectation = 0;
 
 		while (true)
 		{
-			int read = this.input.read(internalBuffer, 0, bufferLen);
+			int read = this.input.read(rawBuffer, 0, bufferLen);
 
 			if (read < 0)
 			{
 				break;
 			}
 
-			byte[] data = ArrayUtils.subarray(internalBuffer, 0, read);
-			this.dataBuffer.addAll(Arrays.asList(ArrayUtils.toObject(data)));
+			byte[] data = ArrayUtils.subarray(rawBuffer, 0, read);
+			dataBuffer.addAll(Arrays.asList(ArrayUtils.toObject(data)));
 
-			while (this.expectation <= this.dataBuffer.size())
+			while (expectation <= dataBuffer.size())
 			{
-				if (this.expectation == 0 && this.dataBuffer.size() < sizeLen)
+				if (expectation == 0 && dataBuffer.size() < sizeLen)
 				{
 					break;
 				}
 
-				if (this.expectation == 0)
+				if (expectation == 0)
 				{
-					Byte[] objectArray = this.dataBuffer.toArray(new Byte[this.dataBuffer.size()]);
+					Byte[] objectArray = dataBuffer.toArray(new Byte[dataBuffer.size()]);
 					ByteBuffer wrapped = ByteBuffer.wrap(ArrayUtils.toPrimitive(objectArray));
 
 					wrapped.order(ByteOrder.LITTLE_ENDIAN);
 
-					this.expectation = wrapped.getInt();
-					this.dataBuffer = new ArrayList<>(this.dataBuffer.subList(4, this.dataBuffer.size()));
+					expectation = wrapped.getInt();
+					dataBuffer = new ArrayList<>(dataBuffer.subList(4, dataBuffer.size()));
 
 					continue;
 				}
 
-				List<Byte> sublist = this.dataBuffer.subList(0, this.expectation);
+				List<Byte> sublist = dataBuffer.subList(0, expectation);
 				Byte[] objectSublist = sublist.toArray(new Byte[sublist.size()]);
 
 				this.parser(objectSublist);
 
-				this.dataBuffer = new ArrayList<>(this.dataBuffer.subList(this.expectation, this.dataBuffer.size()));
-				this.expectation = 0;
+				dataBuffer = new ArrayList<>(dataBuffer.subList(expectation, dataBuffer.size()));
+				expectation = 0;
 			}
 		}
 
-		this.expectation = 0;
 		this.input = null;
 		this.output = null;
-		this.dataBuffer.clear();
 
 		throw new IOException("Disconnected");
 	}
@@ -137,7 +133,7 @@ public class Connection implements Runnable
 
 				this.semaphore.release();
 
-				this.handler();
+				this.receiver();
 
 				break;
 
