@@ -1,6 +1,7 @@
 package ru.mainnika.squirrels.clanstats.net;
 
 import org.apache.commons.lang3.ArrayUtils;
+import ru.mainnika.squirrels.clanstats.net.$.Receiver;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +32,7 @@ public class Connection implements Runnable
 	private Socket socket;
 	private Semaphore semaphore;
 	private String host;
+	private Receiver receiver;
 	private int port;
 	private int id;
 
@@ -66,13 +68,18 @@ public class Connection implements Runnable
 
 		if (format == null)
 		{
-			log.warning("Received unknow packet with type " + type);
+			log.warning("Received unknown packet with type " + type);
 			return;
 		}
 
 		log.info("Received packet " + format);
 
-		Packet packet = Packet.make(format.mask(), data.subList(2, data.size()));
+		Packet packet = Packet.make(format.mask(), format.id(), data.subList(2, data.size()));
+
+		if (this.receiver != null)
+		{
+			this.receiver.onPacket(packet);
+		}
 	}
 
 	private void receiver() throws IOException
@@ -128,7 +135,7 @@ public class Connection implements Runnable
 
 	public void send(Client format, Object... args) throws IOException
 	{
-		Packet packet = Packet.make(format.mask(), args);
+		Packet packet = Packet.make(format.mask(), format.id(), args);
 		Byte[] rawPacket = packet.getRaw();
 
 		ByteBuffer bufferPacket = ByteBuffer.allocate(4 + 4 + 2 + rawPacket.length);
@@ -159,6 +166,11 @@ public class Connection implements Runnable
 
 				log.info("Connected!");
 
+				if (this.receiver != null)
+				{
+					this.receiver.onConnect();
+				}
+
 				this.semaphore.release();
 
 				this.receiver();
@@ -183,6 +195,17 @@ public class Connection implements Runnable
 	{
 		this.thread.start();
 		this.semaphore.acquireUninterruptibly();
+	}
+
+	public void setReceiver(Receiver receiver)
+	{
+		if (this.receiver != null)
+		{
+			this.receiver.onDisconnect();
+			this.receiver = null;
+		}
+
+		this.receiver = receiver;
 	}
 
 	public static Connection create(String host, int port)

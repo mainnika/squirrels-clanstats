@@ -3,9 +3,6 @@ package ru.mainnika.squirrels.clanstats.net;
 import java.util.ArrayList;
 import java.util.Collection;
 
-/**
- * Created by mainn_000 on 7/12/2015.
- */
 public class Group extends ArrayList<Object>
 {
 	public Group()

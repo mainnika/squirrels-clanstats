@@ -21,6 +21,7 @@ public class Packet extends Group
 	}
 
 	private List<Byte> raw;
+	private int id;
 
 	private Packet(String format, ByteBuffer buffer)
 	{
@@ -32,19 +33,22 @@ public class Packet extends Group
 		super(argsGroup);
 	}
 
-	public static Packet make(String format, List<Byte> raw)
+	public static Packet make(String format, int id, List<Byte> raw)
 	{
 		Byte[] object_array = raw.toArray(new Byte[raw.size()]);
 		byte[] primitive_array = ArrayUtils.toPrimitive(object_array);
-
 		ByteBuffer buffer = ByteBuffer.wrap(primitive_array);
 
 		buffer.order(ByteOrder.LITTLE_ENDIAN);
 
-		return new Packet(format, buffer);
+		Packet packet = new Packet(format, buffer);
+
+		packet.id = id;
+
+		return packet;
 	}
 
-	public static Packet make(String format, Object... args) throws IOException
+	public static Packet make(String format, int id, Object... args) throws IOException
 	{
 		Group argsGroup = new Group(Arrays.asList(args));
 		ByteBuffer rawBuffer = writer(format, argsGroup);
@@ -53,6 +57,7 @@ public class Packet extends Group
 		Packet packet = new Packet(argsGroup);
 
 		packet.raw = Arrays.asList(objectArray);
+		packet.id = id;
 
 		return packet;
 	}
@@ -281,6 +286,11 @@ public class Packet extends Group
 		}
 
 		return null;
+	}
+
+	public int getId()
+	{
+		return this.id;
 	}
 
 
