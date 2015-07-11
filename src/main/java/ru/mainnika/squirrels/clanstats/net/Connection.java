@@ -32,6 +32,7 @@ public class Connection implements Runnable
 	private Semaphore semaphore;
 	private String host;
 	private int port;
+	private int id;
 
 	private InputStream input;
 	private OutputStream output;
@@ -48,6 +49,7 @@ public class Connection implements Runnable
 	{
 		InetSocketAddress addr = new InetSocketAddress(this.host, this.port);
 
+		this.id = 0;
 		this.socket = new Socket();
 		this.socket.connect(addr);
 	}
@@ -124,9 +126,22 @@ public class Connection implements Runnable
 		throw new IOException("Disconnected");
 	}
 
-	public void send(byte[] buffer) throws IOException
+	public void send(Client format, Object... args) throws IOException
 	{
-		this.output.write(buffer);
+		Packet packet = new Packet(format.mask(), args);
+		Byte[] rawPacket = packet.getRaw();
+
+		ByteBuffer bufferPacket = ByteBuffer.allocate(4 + 4 + 2 + rawPacket.length);
+
+		bufferPacket.order(ByteOrder.LITTLE_ENDIAN);
+
+		bufferPacket.putInt(rawPacket.length + 4 + 2);
+		bufferPacket.putInt(this.id++);
+		bufferPacket.putShort((short) (int) format.id());
+		bufferPacket.put(ArrayUtils.toPrimitive(rawPacket));
+
+		this.output.write(bufferPacket.array());
+		this.output.flush();
 	}
 
 	public void run()

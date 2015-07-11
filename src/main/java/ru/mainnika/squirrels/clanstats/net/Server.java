@@ -8,9 +8,7 @@ import java.util.HashMap;
 public enum Server
 {
 	HELLO(1, ""),
-	GUARD(2, "S"),
-
-	MAX(999, "");
+	GUARD(2, "S");
 
 	private static HashMap<Integer, Server> _server;
 

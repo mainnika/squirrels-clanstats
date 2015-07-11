@@ -4,7 +4,8 @@ import java.util.HashMap;
 
 public enum Client
 {
-	HELLO(1, "B");
+	HELLO(8, ""),
+	LOGIN(9, "LBSII");
 
 	private static HashMap<Integer, Client> _client;
 
