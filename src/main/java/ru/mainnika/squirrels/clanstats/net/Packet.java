@@ -156,6 +156,12 @@ public class Packet
 					String subMask = format.substring(formatOffset + 1, next);
 					ArrayList<Object> subObjects = (ArrayList) object;
 
+					ByteBuffer rawSize = ByteBuffer.allocate(4);
+
+					rawSize.order(ByteOrder.LITTLE_ENDIAN);
+					rawSize.putInt(subObjects.size());
+
+					buffers.add(rawSize);
 					buffers.add(writer(subMask, subObjects));
 					break;
 				}
