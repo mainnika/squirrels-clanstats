@@ -65,7 +65,7 @@ public class Packet
 					case '[':
 					{
 						int next = format.indexOf(']', i);
-						int subGroupLen = raw.getShort();
+						int subGroupLen = raw.getInt();
 						String subMask = format.substring(i + 1, next);
 
 						result.add(parser(subMask, raw, subGroupLen, optional));
