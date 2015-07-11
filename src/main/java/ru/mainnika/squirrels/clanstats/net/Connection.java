@@ -72,7 +72,7 @@ public class Connection implements Runnable
 
 		log.info("Received packet " + format);
 
-		Packet packet = new Packet(format.mask(), data.subList(2, data.size()));
+		Packet packet = Packet.make(format.mask(), data.subList(2, data.size()));
 	}
 
 	private void receiver() throws IOException
@@ -128,7 +128,7 @@ public class Connection implements Runnable
 
 	public void send(Client format, Object... args) throws IOException
 	{
-		Packet packet = new Packet(format.mask(), args);
+		Packet packet = Packet.make(format.mask(), args);
 		Byte[] rawPacket = packet.getRaw();
 
 		ByteBuffer bufferPacket = ByteBuffer.allocate(4 + 4 + 2 + rawPacket.length);

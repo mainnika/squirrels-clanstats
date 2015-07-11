@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class Packet
+public class Packet extends Group
 {
 	private static final Logger log;
 
@@ -20,15 +20,20 @@ public class Packet
 		log = Logger.getLogger(Connection.class.getName());
 	}
 
-	private String format;
 	private List<Byte> raw;
-	private ArrayList<Object> objects;
 
-	public Packet(String format, List<Byte> raw)
+	private Packet(String format, ByteBuffer buffer)
 	{
-		this.raw = raw;
-		this.format = format;
+		super(parser(format, buffer, 1, false));
+	}
 
+	private Packet(Group argsGroup) throws IOException
+	{
+		super(argsGroup);
+	}
+
+	public static Packet make(String format, List<Byte> raw)
+	{
 		Byte[] object_array = raw.toArray(new Byte[raw.size()]);
 		byte[] primitive_array = ArrayUtils.toPrimitive(object_array);
 
@@ -36,23 +41,25 @@ public class Packet
 
 		buffer.order(ByteOrder.LITTLE_ENDIAN);
 
-		this.objects = parser(format, buffer, 1, false);
+		return new Packet(format, buffer);
 	}
 
-	public Packet(String format, Object... args) throws IOException
+	public static Packet make(String format, Object... args) throws IOException
 	{
-		this.format = format;
-		this.objects = new ArrayList<>(Arrays.asList(args));
-
-		ByteBuffer rawBuffer = writer(format, this.objects);
+		Group argsGroup = new Group(Arrays.asList(args));
+		ByteBuffer rawBuffer = writer(format, argsGroup);
 		Byte[] objectArray = ArrayUtils.toObject(rawBuffer.array());
 
-		this.raw = Arrays.asList(objectArray);
+		Packet packet = new Packet(argsGroup);
+
+		packet.raw = Arrays.asList(objectArray);
+
+		return packet;
 	}
 
-	private static ArrayList<Object> parser(String format, ByteBuffer raw, int groupLen, boolean optional)
+	private static Group parser(String format, ByteBuffer raw, int groupLen, boolean optional)
 	{
-		ArrayList<Object> result = new ArrayList<>();
+		Group result = new Group();
 
 		while (groupLen-- > 0)
 		{
@@ -131,7 +138,7 @@ public class Packet
 		return result;
 	}
 
-	private static ByteBuffer writer(String format, ArrayList<Object> objects) throws IOException
+	private static ByteBuffer writer(String format, Group objects) throws IOException
 	{
 		ArrayList<ByteBuffer> buffers = new ArrayList<>(objects.size());
 
@@ -154,15 +161,15 @@ public class Packet
 
 					int next = format.indexOf(']', formatOffset);
 					String subMask = format.substring(formatOffset + 1, next);
-					ArrayList<Object> subObjects = (ArrayList) object;
+					Group subGroup = (Group) object;
 
 					ByteBuffer rawSize = ByteBuffer.allocate(4);
 
 					rawSize.order(ByteOrder.LITTLE_ENDIAN);
-					rawSize.putInt(subObjects.size());
+					rawSize.putInt(subGroup.size());
 
 					buffers.add(rawSize);
-					buffers.add(writer(subMask, subObjects));
+					buffers.add(writer(subMask, subGroup));
 					break;
 				}
 				case 'B':
@@ -264,11 +271,6 @@ public class Packet
 		}
 
 		return result;
-	}
-
-	public Object get(int index)
-	{
-		return this.objects.get(index);
 	}
 
 	public Byte[] getRaw()
