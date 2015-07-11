@@ -52,9 +52,25 @@ public class Connection implements Runnable
 		this.socket.connect(addr);
 	}
 
-	private void parser(Byte[] data)
+	private void parser(List<Byte> data)
 	{
-		log.info("Received data with size " + data.length);
+		byte[] primitive_data = ArrayUtils.toPrimitive(data.toArray(new Byte[data.size()]));
+		ByteBuffer wrapped_data = ByteBuffer.wrap(primitive_data);
+
+		wrapped_data.order(ByteOrder.LITTLE_ENDIAN);
+
+		int type = wrapped_data.getShort();
+		Server format = Server.getById(type);
+
+		if (format == null)
+		{
+			log.warning("Received unknow packet with type " + type);
+			return;
+		}
+
+		log.info("Received packet " + format);
+
+		Packet packet = new Packet(format.mask(), data.subList(2, data.size()));
 	}
 
 	private void receiver() throws IOException
@@ -95,10 +111,7 @@ public class Connection implements Runnable
 					continue;
 				}
 
-				List<Byte> sublist = dataBuffer.subList(0, expectation);
-				Byte[] objectSublist = sublist.toArray(new Byte[sublist.size()]);
-
-				this.parser(objectSublist);
+				this.parser(dataBuffer.subList(0, expectation));
 
 				dataBuffer = new ArrayList<>(dataBuffer.subList(expectation, dataBuffer.size()));
 				expectation = 0;
