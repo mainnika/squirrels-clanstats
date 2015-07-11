@@ -7,7 +7,10 @@ import java.util.HashMap;
  */
 public enum Server
 {
-	HELLO(1, "B");
+	HELLO(1, ""),
+	GUARD(2, "S"),
+
+	MAX(999, "");
 
 	private static HashMap<Integer, Server> _server;
 
@@ -43,7 +46,7 @@ public enum Server
 		return "Server packet " + this.id + "(" + this.mask + ")";
 	}
 
-	public Server getById(Integer id)
+	public static Server getById(Integer id)
 	{
 		return Server._server.get(id);
 	}

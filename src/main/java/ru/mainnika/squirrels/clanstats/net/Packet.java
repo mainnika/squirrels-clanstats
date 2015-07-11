@@ -94,10 +94,20 @@ public class Packet
 					}
 					case 'S':
 					{
-						int stringLen = raw.getShort();
-						byte[] stringRaw = new byte[stringLen];
+						int stringLen = raw.getInt();
 
-						ByteBuffer stringBuf = raw.get(stringRaw);
+						if (stringLen == 0)
+						{
+							result.add("");
+							break;
+						}
+
+						byte[] stringRaw = new byte[stringLen];
+						int pos = raw.position();
+
+						ByteBuffer stringBuf = raw.get(stringRaw, pos, stringLen);
+						raw.position(pos + stringLen + 1);
+
 						String element = new String(stringBuf.array());
 
 						result.add(element);
@@ -113,8 +123,12 @@ public class Packet
 			}
 		}
 
-
 		return result;
+	}
+
+	public Object get(int index)
+	{
+		return this.objects.get(index);
 	}
 
 	public Byte[] getRaw()
