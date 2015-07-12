@@ -131,6 +131,23 @@ public class Packet extends Group
 						result.add(element);
 						break;
 					}
+					case 'A':
+					{
+						int bufLen = raw.getInt();
+
+						if (bufLen == 0)
+						{
+							result.add(null);
+							break;
+						}
+
+						byte[] bytesRaw = new byte[bufLen];
+
+						raw.get(bytesRaw, 0, bufLen);
+
+						result.add(Arrays.asList(bytesRaw));
+						break;
+					}
 					case ',':
 						optional = true;
 						break;
