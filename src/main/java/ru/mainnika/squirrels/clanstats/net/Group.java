@@ -2,6 +2,7 @@ package ru.mainnika.squirrels.clanstats.net;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class Group extends ArrayList<Object>
 {
@@ -53,6 +54,11 @@ public class Group extends ArrayList<Object>
 	public String getString(int index)
 	{
 		return (String) this.get(index);
+	}
+
+	public List<Byte> getArray(int index)
+	{
+		return (List<Byte>) this.get(index);
 	}
 
 	public boolean has(int index)
