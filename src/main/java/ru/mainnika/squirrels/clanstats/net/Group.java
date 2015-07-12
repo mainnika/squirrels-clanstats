@@ -54,4 +54,9 @@ public class Group extends ArrayList<Object>
 	{
 		return (String) this.get(index);
 	}
+
+	public boolean has(int index)
+	{
+		return this.size() > index;
+	}
 }

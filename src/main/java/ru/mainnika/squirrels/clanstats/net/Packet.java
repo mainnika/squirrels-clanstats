@@ -72,6 +72,9 @@ public class Packet extends Group
 			{
 				char symbol = format.charAt(i);
 
+				if (raw.position() == raw.capacity() && optional)
+					break;
+
 				switch (symbol)
 				{
 					case '[':
@@ -120,12 +123,10 @@ public class Packet extends Group
 						}
 
 						byte[] stringRaw = new byte[stringLen];
-						int pos = raw.position();
 
-						ByteBuffer stringBuf = raw.get(stringRaw, pos, stringLen);
-						raw.position(pos + stringLen + 1);
+						raw.get(stringRaw, 0, stringLen);
 
-						String element = new String(stringBuf.array());
+						String element = new String(stringRaw, StandardCharsets.US_ASCII);
 
 						result.add(element);
 						break;
