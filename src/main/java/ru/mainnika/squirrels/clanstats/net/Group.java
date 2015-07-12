@@ -56,9 +56,9 @@ public class Group extends ArrayList<Object>
 		return (String) this.get(index);
 	}
 
-	public List<Byte> getArray(int index)
+	public byte[] getArray(int index)
 	{
-		return (List<Byte>) this.get(index);
+		return (byte[]) this.get(index);
 	}
 
 	public boolean has(int index)

@@ -8,6 +8,7 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -62,7 +63,7 @@ public class Packet extends Group
 		return packet;
 	}
 
-	private static Group parser(String format, ByteBuffer raw, int groupLen, boolean optional)
+	public static Group parser(String format, ByteBuffer raw, int groupLen, boolean optional)
 	{
 		Group result = new Group();
 
@@ -72,7 +73,7 @@ public class Packet extends Group
 			{
 				char symbol = format.charAt(i);
 
-				if (raw.position() == raw.capacity() && optional)
+				if (raw.position() >= raw.capacity() && optional)
 					break;
 
 				switch (symbol)
@@ -138,7 +139,7 @@ public class Packet extends Group
 
 						if (bufLen == 0)
 						{
-							result.add(null);
+							result.add(new byte[0]);
 							break;
 						}
 
@@ -146,7 +147,7 @@ public class Packet extends Group
 
 						raw.get(bytesRaw, 0, bufLen);
 
-						result.add(Arrays.asList(bytesRaw));
+						result.add(bytesRaw);
 						break;
 					}
 					case ',':
@@ -162,7 +163,7 @@ public class Packet extends Group
 		return result;
 	}
 
-	private static ByteBuffer writer(String format, Group objects) throws IOException
+	public static ByteBuffer writer(String format, Group objects) throws IOException
 	{
 		ArrayList<ByteBuffer> buffers = new ArrayList<>(objects.size());
 
@@ -178,14 +179,14 @@ public class Packet extends Group
 			{
 				case '[':
 				{
-					if (!(object instanceof ArrayList))
+					if (!(object instanceof List))
 					{
 						throw new IOException("Invalid format, ArrayList required");
 					}
 
 					int next = format.indexOf(']', formatOffset);
-					String subMask = format.substring(formatOffset + 1, next);
-					Group subGroup = (Group) object;
+					String subMask = format.substring(formatOffset, next);
+					Group subGroup = new Group((List)object);
 
 					ByteBuffer rawSize = ByteBuffer.allocate(4);
 
@@ -194,6 +195,8 @@ public class Packet extends Group
 
 					buffers.add(rawSize);
 					buffers.add(writer(subMask, subGroup));
+
+					formatOffset = next + 1;
 					break;
 				}
 				case 'B':

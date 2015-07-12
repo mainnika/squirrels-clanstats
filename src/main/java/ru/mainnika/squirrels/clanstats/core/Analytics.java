@@ -1,16 +1,13 @@
 package ru.mainnika.squirrels.clanstats.core;
 
 import ru.mainnika.squirrels.clanstats.net.$.Receiver;
-import ru.mainnika.squirrels.clanstats.net.Client;
-import ru.mainnika.squirrels.clanstats.net.Connection;
-import ru.mainnika.squirrels.clanstats.net.Packet;
-import ru.mainnika.squirrels.clanstats.net.Server;
+import ru.mainnika.squirrels.clanstats.net.*;
 import ru.mainnika.squirrels.clanstats.utils.GuardSolver;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.logging.Logger;
 
 public class Analytics implements Receiver
@@ -26,6 +23,7 @@ public class Analytics implements Receiver
 		on(Server.HELLO, "onHello");
 		on(Server.GUARD, "onGuard");
 		on(Server.LOGIN, "onLogin");
+		on(Server.INFO, "onInfo");
 	}
 
 	private Connection io;
@@ -60,7 +58,13 @@ public class Analytics implements Receiver
 			method.invoke(this, packet);
 		} catch (Exception e)
 		{
-			log.warning("Something wrong with handler (" + e.getMessage() + ")");
+			if (method == null)
+			{
+				log.warning("No handler for packet " + format.toString());
+				return;
+			}
+
+			log.warning("Something wrong with handler " + method.getName() + "(" + e.getMessage() + ")");
 		}
 	}
 
@@ -80,11 +84,10 @@ public class Analytics implements Receiver
 	{
 		log.info("Received guard");
 
-		List<Byte> inflatedTask = packet.getArray(0);
+		byte[] inflatedRaw = packet.getArray(0);
 
-		if (inflatedTask.size() > 0)
+		if (inflatedRaw.length > 0)
 		{
-			byte[] inflatedRaw = (byte[]) inflatedTask.toArray()[0];
 			byte[] deflatedRaw = GuardSolver.deflate(inflatedRaw, 0, inflatedRaw.length);
 
 			String deflatedTask = new String(deflatedRaw);
@@ -96,6 +99,19 @@ public class Analytics implements Receiver
 		}
 
 		this.sendPacket(Client.LOGIN, this.credentials.uid(), this.credentials.type(), this.credentials.auth(), 0, 0);
+	}
+
+	public void onInfo(Packet packet)
+	{
+		byte[] raw = packet.getArray(0);
+		int mask = packet.getInt(1);
+
+		Group info = PlayerInfo.get(raw, mask);
+	}
+
+	public void getPlayer(int uid)
+	{
+		this.sendPacket(Client.REQUEST, Collections.singletonList(uid), 0xFFFFFFFF);
 	}
 
 	public void sendPacket(Client format, Object... args)

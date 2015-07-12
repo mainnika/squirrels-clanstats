@@ -6,6 +6,8 @@ public enum Client
 {
 	HELLO(8, ""),
 	GUARD(32, "S"),
+	REQUEST(16,"[I]I"),
+	REQUEST_NET(17,"[I]I"),
 	LOGIN(9, "LBSII");
 
 	private static HashMap<Integer, Client> _client;
@@ -39,7 +41,7 @@ public enum Client
 
 	public String toString()
 	{
-		return "Client packet " + this.id + " \"" + this.mask + "\"";
+		return "Client packet " + this.id + " " + this.getClass().getName() + "\"" + this.mask + "\"";
 	}
 
 	public Client getById(Integer id)
