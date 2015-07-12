@@ -5,7 +5,7 @@ import java.util.HashMap;
 public enum Server
 {
 	HELLO(1, ""),
-	GUARD(2, "S"),
+	GUARD(2, "A"),
 	LOGIN(5, "B,IIIBBSIIII[B]I[W]BB[BI][BBB]I"),
 	DATA(9, "I[I]");
 
