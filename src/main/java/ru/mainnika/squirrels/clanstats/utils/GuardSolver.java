@@ -74,6 +74,25 @@ public class GuardSolver
 		return Integer.parseInt(m.group("version"));
 	}
 
+	public static byte[] deflate(byte[] inflated, int offset, int len) throws IOException
+	{
+		ByteArrayInputStream byteIn = new ByteArrayInputStream(inflated, offset, len);
+		InflaterInputStream zip = new InflaterInputStream(byteIn);
+		ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+
+		int size;
+		byte[] buffer = new byte[len];
+		while ((size = zip.read(buffer)) != -1)
+		{
+			if (size == 0)
+				continue;
+
+			byteOut.write(buffer, 0, size);
+		}
+
+		return byteOut.toByteArray();
+	}
+
 	public static String getClientHash(int version) throws IOException
 	{
 		if (version == cachedVersion)
@@ -119,25 +138,13 @@ public class GuardSolver
 
 		if (swfBody[0] == 'C')
 		{
-			int compressedSize = swfBuffer.position();
-			ByteArrayInputStream byteIn = new ByteArrayInputStream(swfBody, 8, compressedSize);
-			InflaterInputStream zip = new InflaterInputStream(byteIn);
-			ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-
-			while ((size = zip.read(rawBuffer)) != -1)
-			{
-				if (size == 0)
-					continue;
-
-				byteOut.write(rawBuffer, 0, size);
-			}
-
-			byte[] origSwf = new byte[byteOut.size() + 8];
+			byte[] deflated = deflate(swfBody, 8, swfBuffer.position());
+			byte[] origSwf = new byte[deflated.length + 8];
 
 			origSwf[0] = 'F';
 
 			System.arraycopy(swfBody, 1, origSwf, 1, 7);
-			System.arraycopy(byteOut.toByteArray(), 0, origSwf, 8, byteOut.size());
+			System.arraycopy(deflated, 0, origSwf, 8, deflated.length);
 
 			swfBody = origSwf;
 		}
@@ -172,7 +179,6 @@ public class GuardSolver
 		{
 			int currentVersion = getClientVersion();
 			String cachedHash = getClientHash(currentVersion);
-
 
 		} catch (IOException e)
 		{
