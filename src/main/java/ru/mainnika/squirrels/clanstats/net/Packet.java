@@ -8,7 +8,6 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -32,6 +31,37 @@ public class Packet extends Group
 	private Packet(Group argsGroup) throws IOException
 	{
 		super(argsGroup);
+	}
+
+	private static int find_closing_bracket(String mask, int fromIndex)
+	{
+		int left = 0;
+		int right = 0;
+
+		for (int i = fromIndex; i < mask.length(); i++)
+		{
+			char symbol = mask.charAt(i);
+
+			switch (symbol)
+			{
+				case '[':
+					left ++;
+					continue;
+				case ']':
+					right ++;
+
+					if (left == right)
+					{
+						return i;
+					}
+
+					continue;
+				default:
+					break;
+			}
+		}
+
+		return -1;
 	}
 
 	public static Packet make(String format, int id, List<Byte> raw)
@@ -69,9 +99,9 @@ public class Packet extends Group
 
 		while (groupLen-- > 0)
 		{
-			for (int i = 0; i < format.length(); i++)
+			for (int formatOffset = 0; formatOffset < format.length(); formatOffset++)
 			{
-				char symbol = format.charAt(i);
+				char symbol = format.charAt(formatOffset);
 
 				if (raw.position() >= raw.capacity() && optional)
 					break;
@@ -80,13 +110,13 @@ public class Packet extends Group
 				{
 					case '[':
 					{
-						int next = format.indexOf(']', i);
+						int next = find_closing_bracket(format, formatOffset);
 						int subGroupLen = raw.getInt();
-						String subMask = format.substring(i + 1, next);
+						String subMask = format.substring(formatOffset + 1, next);
 
 						result.add(parser(subMask, raw, subGroupLen, optional));
 
-						i = next;
+						formatOffset = next;
 						break;
 					}
 					case 'B':
@@ -184,9 +214,9 @@ public class Packet extends Group
 						throw new IOException("Invalid format, ArrayList required");
 					}
 
-					int next = format.indexOf(']', formatOffset);
+					int next = find_closing_bracket(format, formatOffset);
 					String subMask = format.substring(formatOffset, next);
-					Group subGroup = new Group((List)object);
+					Group subGroup = new Group((List) object);
 
 					ByteBuffer rawSize = ByteBuffer.allocate(4);
 
