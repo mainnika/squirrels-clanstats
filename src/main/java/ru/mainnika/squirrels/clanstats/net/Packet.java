@@ -114,7 +114,7 @@ public class Packet extends Group
 					}
 					case 'S':
 					{
-						int stringLen = raw.getInt();
+						short stringLen = raw.getShort();
 
 						if (stringLen == 0)
 						{
@@ -268,7 +268,7 @@ public class Packet extends Group
 
 					rawString.order(ByteOrder.LITTLE_ENDIAN);
 					rawString.putShort((short) string.length());
-					rawString.put(string.getBytes(StandardCharsets.US_ASCII));
+					rawString.put(string.getBytes(StandardCharsets.UTF_8));
 					rawString.put((byte) 0);
 
 					buffers.add(rawString);

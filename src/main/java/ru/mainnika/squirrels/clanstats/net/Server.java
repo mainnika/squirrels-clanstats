@@ -40,7 +40,7 @@ public enum Server
 
 	public String toString()
 	{
-		return "Server packet " + this.id + "(" + this.mask + ")";
+		return "Server packet " + this.id + " \"" + this.mask + "\"";
 	}
 
 	public static Server getById(Integer id)

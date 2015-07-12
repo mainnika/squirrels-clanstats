@@ -5,6 +5,7 @@ import java.util.HashMap;
 public enum Client
 {
 	HELLO(8, ""),
+	GUARD(32, "S"),
 	LOGIN(9, "LBSII");
 
 	private static HashMap<Integer, Client> _client;
@@ -38,7 +39,7 @@ public enum Client
 
 	public String toString()
 	{
-		return "Client packet " + this.id + "(" + this.mask + ")";
+		return "Client packet " + this.id + " \"" + this.mask + "\"";
 	}
 
 	public Client getById(Integer id)
