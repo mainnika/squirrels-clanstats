@@ -125,8 +125,9 @@ public class Packet extends Group
 						byte[] stringRaw = new byte[stringLen];
 
 						raw.get(stringRaw, 0, stringLen);
+						raw.position(raw.position() + 1);
 
-						String element = new String(stringRaw, StandardCharsets.US_ASCII);
+						String element = new String(stringRaw, StandardCharsets.UTF_8);
 
 						result.add(element);
 						break;
