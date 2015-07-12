@@ -1,5 +1,7 @@
 package ru.mainnika.squirrels.clanstats.utils;
 
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Scriptable;
 import ru.mainnika.squirrels.clanstats.net.Connection;
 
 import java.io.*;
@@ -93,6 +95,29 @@ public class GuardSolver
 		return byteOut.toByteArray();
 	}
 
+	public static String md5sum(byte[] buffer) throws IOException
+	{
+		MessageDigest md;
+
+		try
+		{
+			md = MessageDigest.getInstance("MD5");
+		} catch (NoSuchAlgorithmException e)
+		{
+			throw new IOException(e);
+		}
+
+		byte[] digest = md.digest(buffer);
+
+		StringBuilder sb = new StringBuilder();
+		for (byte aDigest : digest)
+		{
+			sb.append(Integer.toString((aDigest & 0xff) + 0x100, 16).substring(1));
+		}
+
+		return sb.toString();
+	}
+
 	public static String getClientHash(int version) throws IOException
 	{
 		if (version == cachedVersion)
@@ -149,25 +174,7 @@ public class GuardSolver
 			swfBody = origSwf;
 		}
 
-		MessageDigest md;
-
-		try
-		{
-			md = MessageDigest.getInstance("MD5");
-		} catch (NoSuchAlgorithmException e)
-		{
-			throw new IOException(e);
-		}
-
-		byte[] digest = md.digest(swfBody);
-
-		StringBuilder sb = new StringBuilder();
-		for (byte aDigest : digest)
-		{
-			sb.append(Integer.toString((aDigest & 0xff) + 0x100, 16).substring(1));
-		}
-
-		cachedHash = sb.toString();
+		cachedHash = md5sum(swfBody);
 		cachedVersion = version;
 
 		return cachedHash;
@@ -180,12 +187,24 @@ public class GuardSolver
 			int currentVersion = getClientVersion();
 			String cachedHash = getClientHash(currentVersion);
 
+			String init = "var by_blooddy_crypto_MD5={hashBytes:function(){return\"%s\";}},root={root:null,loaderInfo:{bytes:null}};root.root=root;";
+			String context = String.format(init, cachedHash);
+
+			task = task.replaceAll("\\(([a-z]+)\\sin\\s([0-9]+)\\.\\.\\.([0-9]+)\\)", "(var $1 = $2; $1 < $3; $1 ++)");
+			task = task.replaceAll("return", "");
+
+			Context ctx = Context.enter();
+			Scriptable scope = ctx.initStandardObjects();
+			Object obj = ctx.evaluateString(scope, context + task, null, 0, null);
+			Context.exit();
+
+			return md5sum(((String) obj).getBytes());
+
 		} catch (IOException e)
 		{
+			log.warning("Unable to solve guard " + e.getMessage());
 			return null;
 		}
-
-		return null;
 	}
 
 }
