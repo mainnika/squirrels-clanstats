@@ -37,7 +37,7 @@ public enum Server
 	XSOLLA_SIGNATURE(31, "S"),
 	SMILES(32, "[B]"),
 	BIRTHDAY(33, ""),
-	CLOSEOUTS(34, "I[W],W"),
+	CLOSEOUTS(34, "WI[W]"),
 	OFFERS(35, "B"),
 	TEMPORARY_CLOTHES(36, "[WI][W[BI]]"),
 	DAILY_BONUS_DATA(37, "BB"),
