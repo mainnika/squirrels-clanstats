@@ -7,7 +7,7 @@ public enum Client
 	HELLO(8, ""),
 	GUARD(32, "S"),
 	REQUEST(16,"[I]I"),
-	REQUEST_NET(17,"[I]I"),
+	REQUEST_NET(17,"[L]BI"),
 	LOGIN(9, "LBSII");
 
 	private static HashMap<Integer, Client> _client;
