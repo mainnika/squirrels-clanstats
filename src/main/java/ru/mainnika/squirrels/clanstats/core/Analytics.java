@@ -2,6 +2,10 @@ package ru.mainnika.squirrels.clanstats.core;
 
 import ru.mainnika.squirrels.clanstats.net.$.Receiver;
 import ru.mainnika.squirrels.clanstats.net.*;
+import ru.mainnika.squirrels.clanstats.net.packets.ClanInfo;
+import ru.mainnika.squirrels.clanstats.net.packets.Client;
+import ru.mainnika.squirrels.clanstats.net.packets.PlayerInfo;
+import ru.mainnika.squirrels.clanstats.net.packets.Server;
 import ru.mainnika.squirrels.clanstats.utils.GuardSolver;
 
 import java.io.IOException;

@@ -2,6 +2,8 @@ package ru.mainnika.squirrels.clanstats.net;
 
 import org.apache.commons.lang3.ArrayUtils;
 import ru.mainnika.squirrels.clanstats.net.$.Receiver;
+import ru.mainnika.squirrels.clanstats.net.packets.Client;
+import ru.mainnika.squirrels.clanstats.net.packets.Server;
 
 import java.io.IOException;
 import java.io.InputStream;
