@@ -8,6 +8,7 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -81,7 +82,9 @@ public class Packet extends Group
 
 	public static Packet make(String format, int id, Object... args) throws IOException
 	{
-		Group argsGroup = new Group(Arrays.asList(args));
+		Group groupElement = new Group(Arrays.asList(args));
+		Group argsGroup = new Group(Collections.singletonList(groupElement));
+
 		ByteBuffer rawBuffer = writer(format, argsGroup);
 		Byte[] objectArray = ArrayUtils.toObject(rawBuffer.array());
 
@@ -198,120 +201,126 @@ public class Packet extends Group
 		return result;
 	}
 
-	public static ByteBuffer writer(String format, Group objects) throws IOException
+	public static ByteBuffer writer(String format, Group groups) throws IOException
 	{
-		ArrayList<ByteBuffer> buffers = new ArrayList<>(objects.size());
+		ArrayList<ByteBuffer> buffers = new ArrayList<>();
 
+		int groupsOffset = 0;
 		int objectsOffset = 0;
 		int formatOffset = 0;
 
-		while (formatOffset < format.length())
+		while (groupsOffset < groups.size())
 		{
-			char symbol = format.charAt(formatOffset++);
-			Object object = objects.get(objectsOffset++);
+			Group objects = (Group)groups.get(groupsOffset++);
 
-			switch (symbol)
+			while (formatOffset < format.length())
 			{
-				case '[':
+				char symbol = format.charAt(formatOffset++);
+				Object object = objects.get(objectsOffset++);
+
+				switch (symbol)
 				{
-					if (!(object instanceof List))
+					case '[':
 					{
-						throw new IOException("Invalid format, ArrayList required");
+						if (!(object instanceof List))
+						{
+							throw new IOException("Invalid format, ArrayList required");
+						}
+
+						int next = find_closing_bracket(format, formatOffset);
+						String subMask = format.substring(formatOffset, next);
+						Group subGroup = new Group((List) object);
+
+						ByteBuffer rawSize = ByteBuffer.allocate(4);
+
+						rawSize.order(ByteOrder.LITTLE_ENDIAN);
+						rawSize.putInt(subGroup.size());
+
+						buffers.add(rawSize);
+						buffers.add(writer(subMask, subGroup));
+
+						formatOffset = next + 1;
+						break;
 					}
-
-					int next = find_closing_bracket(format, formatOffset);
-					String subMask = format.substring(formatOffset, next);
-					Group subGroup = new Group((List) object);
-
-					ByteBuffer rawSize = ByteBuffer.allocate(4);
-
-					rawSize.order(ByteOrder.LITTLE_ENDIAN);
-					rawSize.putInt(subGroup.size());
-
-					buffers.add(rawSize);
-					buffers.add(writer(subMask, subGroup));
-
-					formatOffset = next + 1;
-					break;
-				}
-				case 'B':
-				{
-					if (!(object instanceof Byte))
+					case 'B':
 					{
-						throw new IOException("Invalid format, Byte required");
+						if (!(object instanceof Byte))
+						{
+							throw new IOException("Invalid format, Byte required");
+						}
+
+						ByteBuffer rawByte = ByteBuffer.allocate(1);
+
+						rawByte.order(ByteOrder.LITTLE_ENDIAN);
+						rawByte.put((byte) object);
+
+						buffers.add(rawByte);
+						break;
 					}
-
-					ByteBuffer rawByte = ByteBuffer.allocate(1);
-
-					rawByte.order(ByteOrder.LITTLE_ENDIAN);
-					rawByte.put((byte) object);
-
-					buffers.add(rawByte);
-					break;
-				}
-				case 'W':
-				{
-					if (!(object instanceof Short))
+					case 'W':
 					{
-						throw new IOException("Invalid format, Short required");
+						if (!(object instanceof Short))
+						{
+							throw new IOException("Invalid format, Short required");
+						}
+
+						ByteBuffer rawShort = ByteBuffer.allocate(2);
+
+						rawShort.order(ByteOrder.LITTLE_ENDIAN);
+						rawShort.putShort((short) object);
+
+						buffers.add(rawShort);
+						break;
 					}
-
-					ByteBuffer rawShort = ByteBuffer.allocate(2);
-
-					rawShort.order(ByteOrder.LITTLE_ENDIAN);
-					rawShort.putShort((short) object);
-
-					buffers.add(rawShort);
-					break;
-				}
-				case 'I':
-				{
-					if (!(object instanceof Integer))
+					case 'I':
 					{
-						throw new IOException("Invalid format, Integer required");
+						if (!(object instanceof Integer))
+						{
+							throw new IOException("Invalid format, Integer required");
+						}
+
+						ByteBuffer rawInt = ByteBuffer.allocate(4);
+
+						rawInt.order(ByteOrder.LITTLE_ENDIAN);
+						rawInt.putInt((int) object);
+
+						buffers.add(rawInt);
+						break;
 					}
-
-					ByteBuffer rawInt = ByteBuffer.allocate(4);
-
-					rawInt.order(ByteOrder.LITTLE_ENDIAN);
-					rawInt.putInt((int) object);
-
-					buffers.add(rawInt);
-					break;
-				}
-				case 'L':
-				{
-					if (!(object instanceof Long))
+					case 'L':
 					{
-						throw new IOException("Invalid format, Long required");
+						if (!(object instanceof Long))
+						{
+							throw new IOException("Invalid format, Long required");
+						}
+
+						ByteBuffer rawLong = ByteBuffer.allocate(8);
+
+						rawLong.order(ByteOrder.LITTLE_ENDIAN);
+						rawLong.putLong((long) object);
+
+						buffers.add(rawLong);
+						break;
 					}
-
-					ByteBuffer rawLong = ByteBuffer.allocate(8);
-
-					rawLong.order(ByteOrder.LITTLE_ENDIAN);
-					rawLong.putLong((long) object);
-
-					buffers.add(rawLong);
-					break;
-				}
-				case 'S':
-				{
-					if (!(object instanceof String))
+					case 'S':
 					{
-						throw new IOException("Invalid format, String required");
+						if (!(object instanceof String))
+						{
+							throw new IOException("Invalid format, String required");
+						}
+
+						String string = (String) object;
+
+						ByteBuffer rawString = ByteBuffer.allocate(string.length() + 2 + 1);
+
+						rawString.order(ByteOrder.LITTLE_ENDIAN);
+						rawString.putShort((short) string.length());
+						rawString.put(string.getBytes(StandardCharsets.UTF_8));
+						rawString.put((byte) 0);
+
+						buffers.add(rawString);
+						break;
 					}
-
-					String string = (String) object;
-
-					ByteBuffer rawString = ByteBuffer.allocate(string.length() + 2 + 1);
-
-					rawString.order(ByteOrder.LITTLE_ENDIAN);
-					rawString.putShort((short) string.length());
-					rawString.put(string.getBytes(StandardCharsets.UTF_8));
-					rawString.put((byte) 0);
-
-					buffers.add(rawString);
-					break;
 				}
 			}
 		}
