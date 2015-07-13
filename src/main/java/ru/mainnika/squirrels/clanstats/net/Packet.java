@@ -48,12 +48,12 @@ public class Packet extends Group
 					left ++;
 					continue;
 				case ']':
-					right ++;
-
 					if (left == right)
 					{
 						return i;
 					}
+
+					right ++;
 
 					continue;
 				default:
@@ -99,9 +99,11 @@ public class Packet extends Group
 
 		while (groupLen-- > 0)
 		{
-			for (int formatOffset = 0; formatOffset < format.length(); formatOffset++)
+			int formatOffset = 0;
+
+			while (formatOffset < format.length())
 			{
-				char symbol = format.charAt(formatOffset);
+				char symbol = format.charAt(formatOffset++);
 
 				if (raw.position() >= raw.capacity() && optional)
 					break;
@@ -112,11 +114,11 @@ public class Packet extends Group
 					{
 						int next = find_closing_bracket(format, formatOffset);
 						int subGroupLen = raw.getInt();
-						String subMask = format.substring(formatOffset + 1, next);
+						String subMask = format.substring(formatOffset, next);
 
 						result.add(parser(subMask, raw, subGroupLen, optional));
 
-						formatOffset = next;
+						formatOffset = next + 1;
 						break;
 					}
 					case 'B':
