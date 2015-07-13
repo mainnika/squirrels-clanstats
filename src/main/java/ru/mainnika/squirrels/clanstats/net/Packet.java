@@ -25,7 +25,7 @@ public class Packet extends Group
 
 	private Packet(String format, ByteBuffer buffer)
 	{
-		super(parser(format, buffer, 1, false));
+		super(parser(format, buffer, 1, false).getGroup(0));
 	}
 
 	private Packet(Group argsGroup) throws IOException
@@ -99,6 +99,7 @@ public class Packet extends Group
 
 		while (groupLen-- > 0)
 		{
+			Group groupElement = new Group();
 			int formatOffset = 0;
 
 			while (formatOffset < format.length())
@@ -116,7 +117,7 @@ public class Packet extends Group
 						int subGroupLen = raw.getInt();
 						String subMask = format.substring(formatOffset, next);
 
-						result.add(parser(subMask, raw, subGroupLen, optional));
+						groupElement.add(parser(subMask, raw, subGroupLen, optional));
 
 						formatOffset = next + 1;
 						break;
@@ -124,25 +125,25 @@ public class Packet extends Group
 					case 'B':
 					{
 						Byte element = raw.get();
-						result.add(element);
+						groupElement.add(element);
 						break;
 					}
 					case 'W':
 					{
 						Short element = raw.getShort();
-						result.add(element);
+						groupElement.add(element);
 						break;
 					}
 					case 'I':
 					{
 						Integer element = raw.getInt();
-						result.add(element);
+						groupElement.add(element);
 						break;
 					}
 					case 'L':
 					{
 						Long element = raw.getLong();
-						result.add(element);
+						groupElement.add(element);
 						break;
 					}
 					case 'S':
@@ -151,7 +152,7 @@ public class Packet extends Group
 
 						if (stringLen == 0)
 						{
-							result.add("");
+							groupElement.add("");
 							break;
 						}
 
@@ -162,7 +163,7 @@ public class Packet extends Group
 
 						String element = new String(stringRaw, StandardCharsets.UTF_8);
 
-						result.add(element);
+						groupElement.add(element);
 						break;
 					}
 					case 'A':
@@ -171,7 +172,7 @@ public class Packet extends Group
 
 						if (bufLen == 0)
 						{
-							result.add(new byte[0]);
+							groupElement.add(new byte[0]);
 							break;
 						}
 
@@ -179,7 +180,7 @@ public class Packet extends Group
 
 						raw.get(bytesRaw, 0, bufLen);
 
-						result.add(bytesRaw);
+						groupElement.add(bytesRaw);
 						break;
 					}
 					case ',':
@@ -190,6 +191,8 @@ public class Packet extends Group
 						break;
 				}
 			}
+
+			result.add(groupElement);
 		}
 
 		return result;
