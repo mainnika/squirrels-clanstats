@@ -23,8 +23,8 @@ public class GuardSolver
 	private static final Pattern versionPattern = Pattern.compile(".*version\\s=\\s(?<version>[0-9]+).*");
 	private static final Logger log;
 
-	private static int cachedVersion;
-	private static String cachedHash;
+	private static int cachedVersion = 993;
+	private static String cachedHash = "b4fe88ec4d3ac48322e0414d81a999fa";
 
 	static
 	{
@@ -180,7 +180,7 @@ public class GuardSolver
 		return cachedHash;
 	}
 
-	public static String solve(String task)
+	public static synchronized String solve(String task)
 	{
 		try
 		{
