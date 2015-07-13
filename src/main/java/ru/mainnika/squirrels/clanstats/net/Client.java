@@ -8,6 +8,7 @@ public enum Client
 	GUARD(32, "S"),
 	REQUEST(16,"[I]I"),
 	REQUEST_NET(17,"[L]BI"),
+	CLAN_REQUEST(95, "[I]I"),
 	LOGIN(9, "LBSII");
 
 	private static HashMap<Integer, Client> _client;

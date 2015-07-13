@@ -24,6 +24,8 @@ public class Analytics implements Receiver
 		on(Server.GUARD, "onGuard");
 		on(Server.LOGIN, "onLogin");
 		on(Server.INFO, "onInfo");
+		on(Server.INFO_NET, "onInfo");
+		on(Server.CLAN_INFO, "onClanInfo");
 	}
 
 	private Connection io;
@@ -78,6 +80,8 @@ public class Analytics implements Receiver
 		byte status = packet.getByte(0);
 
 		log.info("Received login with status " + status);
+
+		this.requestClan(116837);
 	}
 
 	public void onGuard(Packet packet) throws IOException
@@ -109,9 +113,22 @@ public class Analytics implements Receiver
 		Group info = PlayerInfo.get(raw, mask);
 	}
 
-	public void getPlayer(int uid)
+	public void onClanInfo(Packet packet)
 	{
-		this.sendPacket(Client.REQUEST, Collections.singletonList(uid), 0xFFFFFFFF);
+		byte[] raw = packet.getArray(0);
+		int mask = packet.getInt(1);
+
+		Group info = ClanInfo.get(raw, mask);
+	}
+
+	public void requestPlayer(long uid, byte type)
+	{
+		this.sendPacket(Client.REQUEST_NET, Collections.singletonList(uid), type, 0xFFFFFFFF);
+	}
+
+	public void requestClan(int uid)
+	{
+		this.sendPacket(Client.CLAN_REQUEST, Collections.singletonList(uid), 0xFFFFFFFF);
 	}
 
 	public void sendPacket(Client format, Object... args)
