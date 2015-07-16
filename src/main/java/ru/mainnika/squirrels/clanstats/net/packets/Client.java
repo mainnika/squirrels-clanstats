@@ -11,7 +11,7 @@ public enum Client
 	CLAN_REQUEST(95, "[I]I"),
 	LOGIN(9, "LBSII");
 
-	private static HashMap<Integer, Client> _client;
+	private static HashMap<Short, Client> _client;
 
 	static
 	{
@@ -21,16 +21,16 @@ public enum Client
 			Client._client.put(packet.id, packet);
 	}
 
-	private Integer id;
+	private short id;
 	private String mask;
 
-	Client(Integer id, String mask)
+	Client(int id, String mask)
 	{
-		this.id = id;
+		this.id = (short)id;
 		this.mask = mask;
 	}
 
-	public Integer id()
+	public short id()
 	{
 		return this.id;
 	}
@@ -45,7 +45,7 @@ public enum Client
 		return "Client packet " + this.id + " " + this.getClass().getName() + "\"" + this.mask + "\"";
 	}
 
-	public Client getById(Integer id)
+	public Client getById(short id)
 	{
 		return Client._client.get(id);
 	}

@@ -22,7 +22,7 @@ public class Packet extends Group
 	}
 
 	private List<Byte> raw;
-	private int id;
+	private short id;
 
 	private Packet(String format, ByteBuffer buffer)
 	{
@@ -65,11 +65,9 @@ public class Packet extends Group
 		return -1;
 	}
 
-	public static Packet make(String format, int id, List<Byte> raw)
+	public static Packet make(String format, short id, byte[] raw)
 	{
-		Byte[] object_array = raw.toArray(new Byte[raw.size()]);
-		byte[] primitive_array = ArrayUtils.toPrimitive(object_array);
-		ByteBuffer buffer = ByteBuffer.wrap(primitive_array);
+		ByteBuffer buffer = ByteBuffer.wrap(raw);
 
 		buffer.order(ByteOrder.LITTLE_ENDIAN);
 
@@ -80,7 +78,7 @@ public class Packet extends Group
 		return packet;
 	}
 
-	public static Packet make(String format, int id, Object... args) throws IOException
+	public static Packet make(String format, short id, Object... args) throws IOException
 	{
 		Group groupElement = new Group(Arrays.asList(args));
 		Group argsGroup = new Group(Collections.singletonList(groupElement));
@@ -354,7 +352,7 @@ public class Packet extends Group
 		return null;
 	}
 
-	public int getId()
+	public short getId()
 	{
 		return this.id;
 	}

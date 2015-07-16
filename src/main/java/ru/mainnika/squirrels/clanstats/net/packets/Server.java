@@ -111,7 +111,7 @@ public enum Server
 	REPLAY_DATA(105, "B,IIABIWWWA"),
 	REPLAY_TAG(106, "B,IB");
 
-	private static HashMap<Integer, Server> _server;
+	private static HashMap<Short, Server> _server;
 
 	static
 	{
@@ -121,16 +121,16 @@ public enum Server
 			Server._server.put(packet.id(), packet);
 	}
 
-	private Integer id;
+	private short id;
 	private String mask;
 
-	Server(Integer id, String mask)
+	Server(int id, String mask)
 	{
-		this.id = id;
+		this.id = (short)id;
 		this.mask = mask;
 	}
 
-	public Integer id()
+	public short id()
 	{
 		return this.id;
 	}
@@ -145,7 +145,7 @@ public enum Server
 		return "Server packet " + this.id + " " + this.name() + " \"" + this.mask + "\"";
 	}
 
-	public static Server getById(Integer id)
+	public static Server getById(short id)
 	{
 		return Server._server.get(id);
 	}

@@ -5,6 +5,7 @@ import ru.mainnika.squirrels.clanstats.net.$.Receiver;
 import ru.mainnika.squirrels.clanstats.net.packets.Client;
 import ru.mainnika.squirrels.clanstats.net.packets.Server;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -12,9 +13,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Logger;
 
@@ -58,14 +57,14 @@ public class Connection implements Runnable
 		this.socket.connect(addr);
 	}
 
-	private void parser(List<Byte> data)
+	private void parser(byte[] data)
 	{
-		byte[] primitive_data = ArrayUtils.toPrimitive(data.toArray(new Byte[data.size()]));
-		ByteBuffer wrapped_data = ByteBuffer.wrap(primitive_data);
+		ByteBuffer wrapped_data = ByteBuffer.wrap(data);
 
 		wrapped_data.order(ByteOrder.LITTLE_ENDIAN);
 
-		int type = wrapped_data.getShort();
+		short type = wrapped_data.getShort();
+
 		Server format = Server.getById(type);
 
 		if (format == null)
@@ -74,9 +73,11 @@ public class Connection implements Runnable
 			return;
 		}
 
+		byte[] packetRaw = Arrays.copyOfRange(data, 2, data.length);
+
 		log.info("Received packet " + format);
 
-		Packet packet = Packet.make(format.mask(), format.id(), data.subList(2, data.size()));
+		Packet packet = Packet.make(format.mask(), format.id(), packetRaw);
 
 		if (this.receiver != null)
 		{
@@ -86,46 +87,52 @@ public class Connection implements Runnable
 
 	private void receiver() throws IOException
 	{
-		ArrayList<Byte> dataBuffer = new ArrayList<>(bufferLen);
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+
 		byte[] rawBuffer = new byte[bufferLen];
+		byte[] expectationBuffer = new byte[4];
+
 		int expectation = 0;
+		int received = 0;
 
 		while (true)
 		{
-			int read = this.input.read(rawBuffer, 0, bufferLen);
+			int read;
+
+			if (expectation == 0)
+			{
+				read = this.input.read(expectationBuffer, 0, sizeLen - received);
+				received += read;
+
+				if (received == sizeLen)
+				{
+					ByteBuffer expectationWrapped = ByteBuffer.wrap(expectationBuffer);
+					expectationWrapped.order(ByteOrder.LITTLE_ENDIAN);
+					expectation = expectationWrapped.getInt();
+					received = 0;
+				}
+
+				continue;
+			}
+
+			int needle = Math.min(expectation - received, bufferLen);
+
+			read = this.input.read(rawBuffer, 0, needle);
+			received += read;
 
 			if (read < 0)
 			{
 				break;
 			}
 
-			byte[] data = ArrayUtils.subarray(rawBuffer, 0, read);
-			dataBuffer.addAll(Arrays.asList(ArrayUtils.toObject(data)));
+			out.write(rawBuffer, 0, read);
 
-			while (expectation <= dataBuffer.size())
+			if (received == expectation)
 			{
-				if (expectation == 0 && dataBuffer.size() < sizeLen)
-				{
-					break;
-				}
-
-				if (expectation == 0)
-				{
-					Byte[] objectArray = dataBuffer.toArray(new Byte[dataBuffer.size()]);
-					ByteBuffer wrapped = ByteBuffer.wrap(ArrayUtils.toPrimitive(objectArray));
-
-					wrapped.order(ByteOrder.LITTLE_ENDIAN);
-
-					expectation = wrapped.getInt();
-					dataBuffer = new ArrayList<>(dataBuffer.subList(4, dataBuffer.size()));
-
-					continue;
-				}
-
-				this.parser(dataBuffer.subList(0, expectation));
-
-				dataBuffer = new ArrayList<>(dataBuffer.subList(expectation, dataBuffer.size()));
+				this.parser(out.toByteArray());
+				out.reset();
 				expectation = 0;
+				received = 0;
 			}
 		}
 
