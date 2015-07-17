@@ -1,29 +1,23 @@
 package ru.mainnika.squirrels.clanstats.net;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 public class Group extends ArrayList<Object>
 {
 	public Group()
 	{
-		super();
 	}
 
-	public Group(int capatity)
+	public Group(int capacity)
 	{
-		super(capatity);
+		super(capacity);
 	}
 
-	public Group(Collection<?> init)
+	public Group(Collection<?> collection)
 	{
-		super(init);
-	}
-
-	public Group(Group other)
-	{
-		super(other);
+		super(collection);
 	}
 
 	public Byte getByte(int index)
@@ -65,4 +59,76 @@ public class Group extends ArrayList<Object>
 	{
 		return this.size() > index;
 	}
+
+	public Group addReturn(Object object)
+	{
+		this.add(object);
+		return this;
+	}
+
+	public static Group make(byte... byteArray)
+	{
+		Group result = new Group(byteArray.length);
+
+		for (byte aByte : byteArray)
+		{
+			result.add((new Group(1)).add(aByte));
+		}
+
+		return result;
+	}
+
+	public static Group make(short... byteArray)
+	{
+		Group result = new Group(byteArray.length);
+
+		for (short aByte : byteArray)
+		{
+			result.add((new Group(1)).add(aByte));
+		}
+
+		return result;
+	}
+
+	public static Group make(int... byteArray)
+	{
+		Group result = new Group(byteArray.length);
+
+		for (int aByte : byteArray)
+		{
+			result.add((new Group(1)).addReturn(aByte));
+		}
+
+		return result;
+	}
+
+	public static Group make(long... byteArray)
+	{
+		Group result = new Group(byteArray.length);
+
+		for (long aByte : byteArray)
+		{
+			result.add((new Group(1)).add(aByte));
+		}
+
+		return result;
+	}
+
+	public static Group make(Object... byteArray)
+	{
+		Group result = new Group(byteArray.length);
+
+		for (Object aByte : byteArray)
+		{
+			result.add((new Group(1)).add(aByte));
+		}
+
+		return result;
+	}
+
+	public static Group element(Object... objectArray)
+	{
+		return new Group(Arrays.asList(objectArray));
+	}
+
 }

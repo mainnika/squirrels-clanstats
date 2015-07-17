@@ -9,7 +9,6 @@ import ru.mainnika.squirrels.clanstats.net.packets.Client;
 import ru.mainnika.squirrels.clanstats.net.packets.PlayerInfo;
 import ru.mainnika.squirrels.clanstats.net.packets.Server;
 import ru.mainnika.squirrels.clanstats.utils.GuardSolver;
-import ru.mainnika.squirrels.clanstats.utils.Utils;
 
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -46,12 +45,10 @@ public class Analytics extends Receiver
 
 	public void onDisconnect()
 	{
-
 	}
 
 	public static void onHello(Receiver receiver, Packet packet)
 	{
-		log.info("Received hello");
 	}
 
 	public static void onLogin(Receiver receiver, Packet packet)
@@ -105,11 +102,11 @@ public class Analytics extends Receiver
 
 	public void requestPlayer(byte type, long... uid)
 	{
-		this.sendPacket(Client.REQUEST_NET, Utils.asList(Utils.asList(uid)), type, 0xFFFFFFFF);
+		this.sendPacket(Client.REQUEST_NET, Group.make(uid), type, 0xFFFFFFFF);
 	}
 
 	public void requestClan(int... uid)
 	{
-		this.sendPacket(Client.CLAN_REQUEST, Utils.asList(Utils.asList(uid)), 0xFFFFFFFF);
+		this.sendPacket(Client.CLAN_REQUEST, Group.make(uid), 0xFFFFFFFF);
 	}
 }

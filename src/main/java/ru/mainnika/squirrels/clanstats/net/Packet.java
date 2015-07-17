@@ -204,12 +204,12 @@ public class Packet extends Group
 		ArrayList<ByteBuffer> buffers = new ArrayList<>();
 
 		int groupsOffset = 0;
-		int objectsOffset = 0;
-		int formatOffset = 0;
 
 		while (groupsOffset < groups.size())
 		{
 			Group objects = (Group)groups.get(groupsOffset++);
+			int objectsOffset = 0;
+			int formatOffset = 0;
 
 			while (formatOffset < format.length())
 			{
@@ -220,14 +220,14 @@ public class Packet extends Group
 				{
 					case '[':
 					{
-						if (!(object instanceof List))
+						if (!(object instanceof Group))
 						{
 							throw new IOException("Invalid format, ArrayList required");
 						}
 
 						int next = find_closing_bracket(format, formatOffset);
 						String subMask = format.substring(formatOffset, next);
-						Group subGroup = new Group((List) object);
+						Group subGroup = (Group) object;
 
 						ByteBuffer rawSize = ByteBuffer.allocate(4);
 
