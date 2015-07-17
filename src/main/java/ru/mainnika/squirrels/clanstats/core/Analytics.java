@@ -1,35 +1,37 @@
 package ru.mainnika.squirrels.clanstats.core;
 
+import ru.mainnika.squirrels.clanstats.net.$.Handler;
 import ru.mainnika.squirrels.clanstats.net.$.Receiver;
-import ru.mainnika.squirrels.clanstats.net.*;
+import ru.mainnika.squirrels.clanstats.net.Connection;
+import ru.mainnika.squirrels.clanstats.net.Group;
+import ru.mainnika.squirrels.clanstats.net.Packet;
 import ru.mainnika.squirrels.clanstats.net.packets.ClanInfo;
 import ru.mainnika.squirrels.clanstats.net.packets.Client;
 import ru.mainnika.squirrels.clanstats.net.packets.PlayerInfo;
 import ru.mainnika.squirrels.clanstats.net.packets.Server;
 import ru.mainnika.squirrels.clanstats.utils.GuardSolver;
+import ru.mainnika.squirrels.clanstats.utils.Utils;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
 public class Analytics implements Receiver
 {
 	private static final Logger log;
-	private static final HashMap<Server, Method> handlers;
+	private static final HashMap<Server, Handler> handlers;
 
 	static
 	{
 		log = Logger.getLogger(Connection.class.getName());
 		handlers = new HashMap<>();
 
-		on(Server.HELLO, "onHello");
-		on(Server.GUARD, "onGuard");
-		on(Server.LOGIN, "onLogin");
-		on(Server.INFO, "onInfo");
-		on(Server.INFO_NET, "onInfo");
-		on(Server.CLAN_INFO, "onClanInfo");
+		on(Server.HELLO, Analytics::onHello);
+		on(Server.GUARD, Analytics::onGuard);
+		on(Server.LOGIN, Analytics::onLogin);
+		on(Server.INFO, Analytics::onInfo);
+		on(Server.INFO_NET, Analytics::onInfo);
+		on(Server.CLAN_INFO, Analytics::onClanInfo);
 	}
 
 	private Connection io;
@@ -55,13 +57,13 @@ public class Analytics implements Receiver
 
 	public void onPacket(Packet packet)
 	{
-		int id = packet.getId();
+		short id = packet.getId();
 		Server format = Server.getById(id);
-		Method method = handlers.get(format);
+		Handler method = handlers.get(format);
 
 		try
 		{
-			method.invoke(this, packet);
+			method.handle(this, packet);
 		} catch (Exception e)
 		{
 			if (method == null)
@@ -70,26 +72,29 @@ public class Analytics implements Receiver
 				return;
 			}
 
-			log.warning("Something wrong with handler " + method.getName() + "(" + e.getMessage() + ")");
+			log.warning("Something wrong with handler " + method.toString() + "(" + e.getMessage() + ")");
 		}
 	}
 
-	public void onHello(Packet packet)
+	public static void onHello(Receiver receiver, Packet packet)
 	{
 		log.info("Received hello");
 	}
 
-	public void onLogin(Packet packet)
+	public static void onLogin(Receiver receiver, Packet packet)
 	{
+		Analytics self = (Analytics) receiver;
 		byte status = packet.getByte(0);
 
 		log.info("Received login with status " + status);
 
-		this.requestClan(116837);
+		self.requestClan(116837, 100621);
 	}
 
-	public void onGuard(Packet packet) throws IOException
+	public static void onGuard(Receiver receiver, Packet packet) throws IOException
 	{
+		Analytics self = (Analytics) receiver;
+
 		log.info("Received guard");
 
 		byte[] inflatedRaw = packet.getArray(0);
@@ -103,13 +108,13 @@ public class Analytics implements Receiver
 
 			log.info("Guard response " + response);
 
-			this.sendPacket(Client.GUARD, response);
+			self.sendPacket(Client.GUARD, response);
 		}
 
-		this.sendPacket(Client.LOGIN, this.credentials.uid(), this.credentials.type(), this.credentials.auth(), 0, 0);
+		self.sendPacket(Client.LOGIN, self.credentials.uid(), self.credentials.type(), self.credentials.auth(), 0, 0);
 	}
 
-	public void onInfo(Packet packet)
+	public static void onInfo(Receiver receiver, Packet packet)
 	{
 		byte[] raw = packet.getArray(0);
 		int mask = packet.getInt(1);
@@ -117,7 +122,7 @@ public class Analytics implements Receiver
 		Group info = PlayerInfo.get(raw, mask);
 	}
 
-	public void onClanInfo(Packet packet)
+	public static void onClanInfo(Receiver receiver, Packet packet)
 	{
 		byte[] raw = packet.getArray(0);
 		int mask = packet.getInt(1);
@@ -125,14 +130,14 @@ public class Analytics implements Receiver
 		Group info = ClanInfo.get(raw, mask);
 	}
 
-	public void requestPlayer(long uid, byte type)
+	public void requestPlayer(byte type, long... uid)
 	{
-		this.sendPacket(Client.REQUEST_NET, Collections.singletonList(uid), type, 0xFFFFFFFF);
+		this.sendPacket(Client.REQUEST_NET, Utils.asList(Utils.asList(uid)), type, 0xFFFFFFFF);
 	}
 
-	public void requestClan(int uid)
+	public void requestClan(int... uid)
 	{
-		this.sendPacket(Client.CLAN_REQUEST, Collections.singletonList(uid), 0xFFFFFFFF);
+		this.sendPacket(Client.CLAN_REQUEST, Utils.asList(Utils.asList(uid)), 0xFFFFFFFF);
 	}
 
 	public void sendPacket(Client format, Object... args)
@@ -146,14 +151,8 @@ public class Analytics implements Receiver
 		}
 	}
 
-	public static void on(Server format, String method)
+	public static void on(Server format, Handler method)
 	{
-		try
-		{
-			handlers.put(format, Analytics.class.getMethod(method, Packet.class));
-		} catch (NoSuchMethodException e)
-		{
-			log.warning("Can not register handler " + method + " (" + e.getMessage() + ")");
-		}
+		handlers.put(format, method);
 	}
 }
