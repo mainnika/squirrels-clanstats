@@ -9,12 +9,11 @@ import ru.mainnika.squirrels.clanstats.net.packets.Client;
 import ru.mainnika.squirrels.clanstats.net.packets.PlayerInfo;
 import ru.mainnika.squirrels.clanstats.net.packets.Server;
 import ru.mainnika.squirrels.clanstats.utils.GuardSolver;
-import ru.mainnika.squirrels.clanstats.utils.Timers;
 
 import java.io.IOException;
 import java.util.logging.Logger;
 
-public class Analytics extends Receiver implements Timers.Listenter
+public class Analytics extends Receiver
 {
 	private static final Logger log;
 
@@ -46,12 +45,6 @@ public class Analytics extends Receiver implements Timers.Listenter
 
 	public void onDisconnect()
 	{
-	}
-
-	@Override
-	public void onTimer()
-	{
-
 	}
 
 	public void onHello(Packet packet)
