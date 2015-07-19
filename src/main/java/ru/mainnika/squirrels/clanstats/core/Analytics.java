@@ -9,11 +9,12 @@ import ru.mainnika.squirrels.clanstats.net.packets.Client;
 import ru.mainnika.squirrels.clanstats.net.packets.PlayerInfo;
 import ru.mainnika.squirrels.clanstats.net.packets.Server;
 import ru.mainnika.squirrels.clanstats.utils.GuardSolver;
+import ru.mainnika.squirrels.clanstats.utils.Timers;
 
 import java.io.IOException;
 import java.util.logging.Logger;
 
-public class Analytics extends Receiver
+public class Analytics extends Receiver implements Timers.Listenter
 {
 	private static final Logger log;
 
@@ -21,12 +22,12 @@ public class Analytics extends Receiver
 	{
 		log = Logger.getLogger(Connection.class.getName());
 
-		on(Server.HELLO, Analytics::onHello);
-		on(Server.GUARD, Analytics::onGuard);
-		on(Server.LOGIN, Analytics::onLogin);
-		on(Server.INFO, Analytics::onInfo);
-		on(Server.INFO_NET, Analytics::onInfo);
-		on(Server.CLAN_INFO, Analytics::onClanInfo);
+		on(Server.HELLO, "onHello");
+		on(Server.GUARD, "onGuard");
+		on(Server.LOGIN, "onLogin");
+		on(Server.INFO, "onInfo");
+		on(Server.INFO_NET, "onInfo");
+		on(Server.CLAN_INFO, "onClanInfo");
 	}
 
 	private Credentials credentials;
@@ -47,24 +48,27 @@ public class Analytics extends Receiver
 	{
 	}
 
-	public static void onHello(Receiver receiver, Packet packet)
+	@Override
+	public void onTimer()
+	{
+
+	}
+
+	public void onHello(Packet packet)
 	{
 	}
 
-	public static void onLogin(Receiver receiver, Packet packet)
+	public void onLogin(Packet packet)
 	{
-		Analytics self = (Analytics) receiver;
 		byte status = packet.getByte(0);
 
 		log.info("Received login with status " + status);
 
-		self.requestClan(116837, 100621);
+		this.requestClan(116837, 100621);
 	}
 
-	public static void onGuard(Receiver receiver, Packet packet) throws IOException
+	public void onGuard(Packet packet) throws IOException
 	{
-		Analytics self = (Analytics) receiver;
-
 		log.info("Received guard");
 
 		byte[] inflatedRaw = packet.getArray(0);
@@ -78,13 +82,13 @@ public class Analytics extends Receiver
 
 			log.info("Guard response " + response);
 
-			self.sendPacket(Client.GUARD, response);
+			this.sendPacket(Client.GUARD, response);
 		}
 
-		self.sendPacket(Client.LOGIN, self.credentials.uid(), self.credentials.type(), self.credentials.auth(), 0, 0);
+		this.sendPacket(Client.LOGIN, this.credentials.uid(), this.credentials.type(), this.credentials.auth(), 0, 0);
 	}
 
-	public static void onInfo(Receiver receiver, Packet packet)
+	public void onInfo(Packet packet)
 	{
 		byte[] raw = packet.getArray(0);
 		int mask = packet.getInt(1);
@@ -92,7 +96,7 @@ public class Analytics extends Receiver
 		Group info = PlayerInfo.get(raw, mask);
 	}
 
-	public static void onClanInfo(Receiver receiver, Packet packet)
+	public void onClanInfo(Packet packet)
 	{
 		byte[] raw = packet.getArray(0);
 		int mask = packet.getInt(1);

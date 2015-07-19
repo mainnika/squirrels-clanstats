@@ -1,17 +1,18 @@
 package ru.mainnika.squirrels.clanstats.net;
 
-import ru.mainnika.squirrels.clanstats.net.$.Handler;
+import ru.mainnika.squirrels.clanstats.core.Analytics;
 import ru.mainnika.squirrels.clanstats.net.packets.Client;
 import ru.mainnika.squirrels.clanstats.net.packets.Server;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
 public abstract class Receiver
 {
 	private static final Logger log;
-	private static final HashMap<Server, Handler> handlers;
+	private static final HashMap<Server, Method> handlers;
 
 	static
 	{
@@ -35,11 +36,11 @@ public abstract class Receiver
 	{
 		short id = packet.getId();
 		Server format = Server.getById(id);
-		Handler method = handlers.get(format);
+		Method method = handlers.get(format);
 
 		try
 		{
-			method.handle(this, packet);
+			method.invoke(packet);
 		} catch (Exception e)
 		{
 			if (method == null)
@@ -63,9 +64,15 @@ public abstract class Receiver
 		}
 	}
 
-	public static void on(Server format, Handler method)
+	public static void on(Server format, String method)
 	{
-		handlers.put(format, method);
+		try
+		{
+			handlers.put(format, Analytics.class.getMethod(method, Packet.class));
+		} catch (NoSuchMethodException e)
+		{
+			log.warning("Can not register handler " + method + " (" + e.getMessage() + ")");
+		}
 	}
 
 }

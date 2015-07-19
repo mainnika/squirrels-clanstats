@@ -13,7 +13,6 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
-import java.util.concurrent.Semaphore;
 import java.util.logging.Logger;
 
 public class Connection implements Runnable
@@ -30,7 +29,6 @@ public class Connection implements Runnable
 
 	private Thread thread;
 	private Socket socket;
-	private Semaphore semaphore;
 	private String host;
 	private Receiver receiver;
 	private int port;
@@ -43,8 +41,6 @@ public class Connection implements Runnable
 	{
 		this.host = host;
 		this.port = port;
-
-		this.semaphore = new Semaphore(0, true);
 	}
 
 	private void connect() throws IOException
@@ -102,6 +98,11 @@ public class Connection implements Runnable
 			{
 				read = this.input.read(expectationBuffer, 0, sizeLen - received);
 				received += read;
+
+				if (read < 0)
+				{
+					break;
+				}
 
 				if (received == sizeLen)
 				{
@@ -179,8 +180,6 @@ public class Connection implements Runnable
 					this.receiver.onConnect();
 				}
 
-				this.semaphore.release();
-
 				this.receiver();
 
 				break;
@@ -202,7 +201,6 @@ public class Connection implements Runnable
 	public void start()
 	{
 		this.thread.start();
-		this.semaphore.acquireUninterruptibly();
 	}
 
 	public void setReceiver(Receiver receiver)
@@ -222,6 +220,7 @@ public class Connection implements Runnable
 
 		Connection instance = new Connection(host, port);
 		instance.thread = new Thread(instance);
+		instance.thread.setDaemon(true);
 
 		return instance;
 	}

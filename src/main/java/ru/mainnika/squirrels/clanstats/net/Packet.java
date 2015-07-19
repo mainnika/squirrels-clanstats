@@ -46,7 +46,7 @@ public class Packet extends Group
 			switch (symbol)
 			{
 				case '[':
-					left ++;
+					left++;
 					continue;
 				case ']':
 					if (left == right)
@@ -54,7 +54,7 @@ public class Packet extends Group
 						return i;
 					}
 
-					right ++;
+					right++;
 
 					continue;
 				default:
@@ -188,7 +188,7 @@ public class Packet extends Group
 						optional = true;
 						break;
 					default:
-						log.warning("Unknow symbol in mask (" + symbol + ")");
+						log.warning("Unknown symbol in mask (" + symbol + ")");
 						break;
 				}
 			}
@@ -207,7 +207,7 @@ public class Packet extends Group
 
 		while (groupsOffset < groups.size())
 		{
-			Group objects = (Group)groups.get(groupsOffset++);
+			Group objects = (Group) groups.get(groupsOffset++);
 			int objectsOffset = 0;
 			int formatOffset = 0;
 
