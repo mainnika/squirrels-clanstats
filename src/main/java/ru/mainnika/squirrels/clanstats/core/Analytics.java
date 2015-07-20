@@ -13,20 +13,13 @@ import ru.mainnika.squirrels.clanstats.utils.GuardSolver;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-public class Analytics extends Receiver
+public class Analytics extends Receiver<Analytics>
 {
 	private static final Logger log;
 
 	static
 	{
 		log = Logger.getLogger(Connection.class.getName());
-
-		on(Server.HELLO, "onHello");
-		on(Server.GUARD, "onGuard");
-		on(Server.LOGIN, "onLogin");
-		on(Server.INFO, "onInfo");
-		on(Server.INFO_NET, "onInfo");
-		on(Server.CLAN_INFO, "onClanInfo");
 	}
 
 	private Credentials credentials;
@@ -34,6 +27,13 @@ public class Analytics extends Receiver
 	public Analytics(Connection connection, Credentials credentials)
 	{
 		super(connection);
+
+		this.on(Server.HELLO, "onHello");
+		this.on(Server.GUARD, "onGuard");
+		this.on(Server.LOGIN, "onLogin");
+		this.on(Server.INFO, "onInfo");
+		this.on(Server.INFO_NET, "onInfo");
+		this.on(Server.CLAN_INFO, "onClanInfo");
 
 		this.credentials = credentials;
 	}
