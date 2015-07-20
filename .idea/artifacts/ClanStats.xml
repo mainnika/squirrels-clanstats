@@ -1,7 +1,7 @@
 <component name="ArtifactManager">
   <artifact type="war" build-on-make="true" name="ClanStats">
     <output-path>$PROJECT_DIR$/out/artifacts/ClanStats</output-path>
-    <root id="archive" name="ClanStats.war">
+    <root id="archive" name="ROOT.war">
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">
           <element id="module-output" name="squirrels-clanstats" />

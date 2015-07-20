@@ -194,6 +194,7 @@ public class Connection implements Runnable
 				Thread.sleep(1000);
 			} catch (InterruptedException ignored)
 			{
+				break;
 			}
 		}
 	}
@@ -202,6 +203,13 @@ public class Connection implements Runnable
 	{
 		this.thread.start();
 	}
+
+	public void stop()
+	{
+		this.thread.interrupt();
+//		this.thread.join();
+	}
+
 
 	public void setReceiver(Receiver receiver)
 	{

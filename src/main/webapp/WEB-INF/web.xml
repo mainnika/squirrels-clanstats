@@ -15,9 +15,19 @@
         <servlet-class>ru.mainnika.squirrels.clanstats.api.Hello</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>Ping</servlet-name>
+        <servlet-class>ru.mainnika.squirrels.clanstats.api.Ping</servlet-class>
+    </servlet>
+
     <servlet-mapping>
         <servlet-name>Hello</servlet-name>
         <url-pattern>/hello</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>Ping</servlet-name>
+        <url-pattern>/ping</url-pattern>
     </servlet-mapping>
 
 </web-app>
