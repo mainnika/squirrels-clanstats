@@ -9,11 +9,13 @@ import ru.mainnika.squirrels.clanstats.net.packets.Client;
 import ru.mainnika.squirrels.clanstats.net.packets.PlayerInfo;
 import ru.mainnika.squirrels.clanstats.net.packets.Server;
 import ru.mainnika.squirrels.clanstats.utils.GuardSolver;
+import ru.mainnika.squirrels.clanstats.utils.Timers;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-public class Analytics extends Receiver<Analytics>
+public class Analytics extends Receiver<Analytics> implements Timers.Task
 {
 	private static final Logger log;
 
@@ -45,6 +47,13 @@ public class Analytics extends Receiver<Analytics>
 
 	public void onDisconnect()
 	{
+		Timers.unsubscribe(this);
+	}
+
+	@Override
+	public void onTimer()
+	{
+		log.info("Timer tick!");
 	}
 
 	public void onHello(Packet packet)
@@ -62,6 +71,8 @@ public class Analytics extends Receiver<Analytics>
 			this.io.disconnect();
 			return;
 		}
+
+		Timers.subscribe(this, 5, 5, TimeUnit.MINUTES);
 
 		this.requestClan(116837, 100621);
 	}

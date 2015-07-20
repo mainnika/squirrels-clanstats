@@ -3,24 +3,16 @@ package ru.mainnika.squirrels.clanstats.utils;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
-public class UnIdleService implements Runnable
+public class UnIdleService implements Timers.Task
 {
-	private static final ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
-
 	private static final String instanceUrl = "http://sqclanstats.azurewebsites.net/ping";
-//	private static final String instanceUrl = "http://localhost:8080/clan/ping";
-
 	private static final Logger log;
 
 	private static UnIdleService instance = null;
-	private static ScheduledFuture task = null;
 
 	static
 	{
@@ -31,15 +23,15 @@ public class UnIdleService implements Runnable
 
 	public static UnIdleService create()
 	{
-		log.info("UnIdle service creating");
-
-		synchronized (service)
+		synchronized (log)
 		{
 			if (instance != null)
 				return instance;
 
+			log.info("UnIdle service creating");
+
 			instance = new UnIdleService();
-			task = service.scheduleAtFixedRate(instance, 1, 1, TimeUnit.MINUTES);
+			Timers.subscribe(instance, 1, 1, TimeUnit.MINUTES);
 
 			return instance;
 		}
@@ -49,15 +41,10 @@ public class UnIdleService implements Runnable
 	{
 		log.info("UnIdle service destroying");
 
-		synchronized (service)
+		synchronized (log)
 		{
 			instance.isIdle.set(false);
-
-			service.shutdownNow();
-			task.cancel(true);
-
 			instance = null;
-			task = null;
 		}
 	}
 
@@ -69,7 +56,7 @@ public class UnIdleService implements Runnable
 	}
 
 	@Override
-	public void run()
+	public void onTimer()
 	{
 		this.isIdle.set(true);
 
