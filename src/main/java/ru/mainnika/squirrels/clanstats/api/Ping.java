@@ -18,7 +18,7 @@ public class Ping extends HttpServlet
 
 		UnIdleService.create().ping();
 
-		String result = String.format("{\"timestamp\": %d}", (int) (System.currentTimeMillis() / 1000L));
+		String result = String.format("{\"method\":\"ping\", \"timestamp\": %d}", (int) (System.currentTimeMillis() / 1000L));
 
 		out.print(result);
 	}

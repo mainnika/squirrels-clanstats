@@ -13,6 +13,9 @@ public class Hello extends HttpServlet
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
 	{
 		ServletOutputStream out = resp.getOutputStream();
-		out.print("Hello");
+
+		String result = String.format("{\"method\":\"hello\", \"timestamp\": %d}", (int) (System.currentTimeMillis() / 1000L));
+
+		out.print(result);
 	}
 }
