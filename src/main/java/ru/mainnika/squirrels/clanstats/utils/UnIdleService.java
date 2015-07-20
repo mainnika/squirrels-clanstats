@@ -31,6 +31,8 @@ public class UnIdleService implements Runnable
 
 	public static UnIdleService create()
 	{
+		log.info("UnIdle service creating");
+
 		synchronized (service)
 		{
 			if (instance != null)
@@ -45,8 +47,13 @@ public class UnIdleService implements Runnable
 
 	public static void destroy()
 	{
+		log.info("UnIdle service destroying");
+
 		synchronized (service)
 		{
+			instance.isIdle.set(false);
+
+			service.shutdownNow();
 			task.cancel(true);
 
 			instance = null;
