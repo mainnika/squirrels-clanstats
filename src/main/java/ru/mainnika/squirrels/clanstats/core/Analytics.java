@@ -91,6 +91,12 @@ public class Analytics extends Receiver
 	{
 		byte[] raw = packet.getArray(0);
 		int mask = packet.getInt(1);
+		boolean full = mask == -65537;
+
+		if (!full)
+		{
+			return;
+		}
 
 		Group info = PlayerInfo.get(raw, mask);
 	}
@@ -99,6 +105,12 @@ public class Analytics extends Receiver
 	{
 		byte[] raw = packet.getArray(0);
 		int mask = packet.getInt(1);
+		boolean full = mask == -65537;
+
+		if (!full)
+		{
+			return;
+		}
 
 		Group info = ClanInfo.get(raw, mask);
 	}
