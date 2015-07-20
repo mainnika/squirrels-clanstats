@@ -20,7 +20,7 @@ public abstract class Receiver
 		handlers = new HashMap<>();
 	}
 
-	private Connection io;
+	protected Connection io;
 
 	public Receiver(Connection connection)
 	{
@@ -40,7 +40,7 @@ public abstract class Receiver
 
 		try
 		{
-			method.invoke(packet);
+			method.invoke(this, packet);
 		} catch (Exception e)
 		{
 			if (method == null)

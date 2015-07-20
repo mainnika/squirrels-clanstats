@@ -43,13 +43,18 @@ public class Connection implements Runnable
 		this.port = port;
 	}
 
-	private void connect() throws IOException
+	public void connect() throws IOException
 	{
 		InetSocketAddress addr = new InetSocketAddress(this.host, this.port);
 
 		this.id = 0;
 		this.socket = new Socket();
 		this.socket.connect(addr);
+	}
+
+	public void disconnect() throws IOException
+	{
+		this.socket.close();
 	}
 
 	private void parser(byte[] data)

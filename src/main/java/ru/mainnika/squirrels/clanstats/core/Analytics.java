@@ -51,11 +51,17 @@ public class Analytics extends Receiver
 	{
 	}
 
-	public void onLogin(Packet packet)
+	public void onLogin(Packet packet) throws IOException
 	{
 		byte status = packet.getByte(0);
 
 		log.info("Received login with status " + status);
+
+		if (status != 0)
+		{
+			this.io.disconnect();
+			return;
+		}
 
 		this.requestClan(116837, 100621);
 	}
