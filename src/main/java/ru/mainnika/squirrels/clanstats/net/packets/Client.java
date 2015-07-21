@@ -6,10 +6,11 @@ public enum Client
 {
 	HELLO(8, ""),
 	GUARD(32, "S"),
-	REQUEST(16,"[I]I"),
-	REQUEST_NET(17,"[L]BI"),
+	REQUEST(16, "[I]I"),
+	REQUEST_NET(17, "[L]BI"),
 	CLAN_REQUEST(95, "[I]I"),
-	LOGIN(9, "LBSII");
+	LOGIN(9, "LBSII"),
+	CLAN_GET_MEMBERS(100, "I");
 
 	private static HashMap<Short, Client> _client;
 
@@ -26,7 +27,7 @@ public enum Client
 
 	Client(int id, String mask)
 	{
-		this.id = (short)id;
+		this.id = (short) id;
 		this.mask = mask;
 	}
 

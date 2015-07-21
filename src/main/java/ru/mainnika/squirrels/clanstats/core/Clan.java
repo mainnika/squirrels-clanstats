@@ -2,6 +2,8 @@ package ru.mainnika.squirrels.clanstats.core;
 
 import ru.mainnika.squirrels.clanstats.net.Group;
 
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,6 +21,7 @@ public class Clan
 	private String emblem;
 
 	private HashMap<Integer, Map.Entry<Integer, Integer>> statsDaily;
+	private ArrayList<Integer> players;
 
 	private Clan()
 	{
@@ -69,6 +72,24 @@ public class Clan
 		return this.emblem;
 	}
 
+	public void setBalance(int coins, int nuts)
+	{
+		this.coins = coins;
+		this.nuts = nuts;
+	}
+
+	public void setPlayers(Group players)
+	{
+		this.players = new ArrayList<>(players.size());
+
+		for (int i = 0; i < players.size(); i++)
+		{
+			Integer playerId = players.getGroup(i).getInt(0);
+			this.players.add(playerId);
+		}
+
+	}
+
 	public static Clan fromInfo(Group info)
 	{
 		Clan clan = new Clan();
@@ -81,6 +102,14 @@ public class Clan
 		clan.name = info.getString(1);
 		clan.photo = info.getString(2);
 		clan.emblem = info.getString(3);
+
+		clan.statsDaily = new HashMap<>();
+		Group stats = info.getGroup(20);
+		for (int i = 0; i < stats.size(); i++)
+		{
+			Group element = stats.getGroup(i);
+			clan.statsDaily.put(element.getInt(0), new AbstractMap.SimpleEntry<Integer, Integer>(element.getInt(1), element.getInt(2)));
+		}
 
 		return clan;
 	}

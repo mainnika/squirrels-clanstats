@@ -40,4 +40,9 @@ public class ClansCache
 		}
 	}
 
+	public Clan get(int id)
+	{
+		return this.clans.get(id);
+	}
+
 }

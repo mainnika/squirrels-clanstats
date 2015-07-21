@@ -41,6 +41,8 @@ public class Analytics extends Receiver<Analytics> implements Timers.Task
 		this.on(Server.INFO, "onPlayerInfo");
 		this.on(Server.INFO_NET, "onPlayerInfo");
 		this.on(Server.CLAN_INFO, "onClanInfo");
+		this.on(Server.CLAN_BALANCE, "onClanBalance");
+		this.on(Server.CLAN_MEMBERS, "onClanMembers");
 
 		this.credentials = credentials;
 	}
@@ -150,6 +152,8 @@ public class Analytics extends Receiver<Analytics> implements Timers.Task
 		{
 			Group element = info.getGroup(i);
 			clans[i] = Clan.fromInfo(element);
+
+			this.sendPacket(Client.CLAN_GET_MEMBERS, clans[i].id());
 		}
 
 		if (clans.length == 0)
@@ -158,6 +162,31 @@ public class Analytics extends Receiver<Analytics> implements Timers.Task
 		this.clanReceived(clans[0]);
 
 		ClansCache.getInstance().put(clans);
+	}
+
+	public void onClanBalance(Packet packet)
+	{
+		if (this.clan == null)
+		{
+			return;
+		}
+
+		int coins = packet.getInt(0);
+		int nuts = packet.getInt(1);
+
+		this.clan.setBalance(coins, nuts);
+	}
+
+	public void onClanMembers(Packet packet)
+	{
+		Clan clan = ClansCache.getInstance().get(packet.getInt(0));
+
+		if (clan == null)
+		{
+			return;
+		}
+
+		clan.setPlayers(packet.getGroup(1));
 	}
 
 	public void playerReceived(Player player)
