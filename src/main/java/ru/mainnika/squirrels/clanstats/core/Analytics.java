@@ -186,6 +186,15 @@ public class Analytics extends Receiver<Analytics> implements Timers.Task
 			return;
 		}
 
+		Group members = packet.getGroup(1);
+		int[] membersArray = new int[members.size()];
+
+		for (int i = 0; i < members.size(); i++)
+		{
+			membersArray[i] = members.getGroup(i).getInt(0);
+		}
+
+		this.requestPlayer(membersArray);
 		clan.setPlayers(packet.getGroup(1));
 	}
 
@@ -215,7 +224,7 @@ public class Analytics extends Receiver<Analytics> implements Timers.Task
 		this.sendPacket(Client.REQUEST_NET, Group.make(nid), type, 0xFFFFFFFF);
 	}
 
-	public void requestPlayer(long... uid)
+	public void requestPlayer(int... uid)
 	{
 		this.sendPacket(Client.REQUEST, Group.make(uid), 0xFFFFFFFF);
 	}
