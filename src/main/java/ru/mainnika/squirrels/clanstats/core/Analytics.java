@@ -62,6 +62,11 @@ public class Analytics extends Receiver<Analytics> implements Timers.Task
 	public void onTimer()
 	{
 		log.info("Timer tick!");
+
+		if (this.clan != null)
+		{
+			this.requestClan(this.clan.id());
+		}
 	}
 
 	public void onHello(Packet packet)
@@ -82,7 +87,7 @@ public class Analytics extends Receiver<Analytics> implements Timers.Task
 
 		this.playerId = packet.getInt(1);
 
-		Timers.subscribe(this, 5, 5, TimeUnit.MINUTES);
+		Timers.subscribe(this, 1, 1, TimeUnit.MINUTES);
 	}
 
 	public void onGuard(Packet packet) throws IOException
