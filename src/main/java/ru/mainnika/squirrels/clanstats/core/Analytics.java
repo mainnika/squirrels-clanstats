@@ -33,8 +33,8 @@ public class Analytics extends Receiver<Analytics> implements Timers.Task
 		this.on(Server.HELLO, "onHello");
 		this.on(Server.GUARD, "onGuard");
 		this.on(Server.LOGIN, "onLogin");
-		this.on(Server.INFO, "onInfo");
-		this.on(Server.INFO_NET, "onInfo");
+		this.on(Server.INFO, "onPlayerInfo");
+		this.on(Server.INFO_NET, "onPlayerInfo");
 		this.on(Server.CLAN_INFO, "onClanInfo");
 
 		this.credentials = credentials;
@@ -98,11 +98,11 @@ public class Analytics extends Receiver<Analytics> implements Timers.Task
 		this.sendPacket(Client.LOGIN, this.credentials.uid(), this.credentials.type(), this.credentials.auth(), 0, 0);
 	}
 
-	public void onInfo(Packet packet)
+	public void onPlayerInfo(Packet packet)
 	{
 		byte[] raw = packet.getArray(0);
 		int mask = packet.getInt(1);
-		boolean full = mask == -65537;
+		boolean full = mask == -1;
 
 		if (!full)
 		{
@@ -110,6 +110,15 @@ public class Analytics extends Receiver<Analytics> implements Timers.Task
 		}
 
 		Group info = PlayerInfo.get(raw, mask);
+		Player[] players = new Player[info.size()];
+
+		for (int i = 0; i < info.size(); i++)
+		{
+			Group element = info.getGroup(i);
+			players[i] = Player.fromInfo(element);
+		}
+
+		PlayersCache.getInstance().put(players);
 	}
 
 	public void onClanInfo(Packet packet)
@@ -126,9 +135,14 @@ public class Analytics extends Receiver<Analytics> implements Timers.Task
 		Group info = ClanInfo.get(raw, mask);
 	}
 
-	public void requestPlayer(byte type, long... uid)
+	public void requestPlayer(byte type, long... nid)
 	{
-		this.sendPacket(Client.REQUEST_NET, Group.make(uid), type, 0xFFFFFFFF);
+		this.sendPacket(Client.REQUEST_NET, Group.make(nid), type, 0xFFFFFFFF);
+	}
+
+	public void requestPlayer(long... uid)
+	{
+		this.sendPacket(Client.REQUEST, Group.make(uid), 0xFFFFFFFF);
 	}
 
 	public void requestClan(int... uid)
