@@ -24,8 +24,12 @@ public class Analytics extends Receiver<Analytics> implements Timers.Task
 		log = Logger.getLogger(Connection.class.getName());
 	}
 
+	private int playerId;
+	private int clanId;
+
 	private Credentials credentials;
 	private Player player;
+	private Clan clan;
 
 	public Analytics(Connection connection, Credentials credentials)
 	{
@@ -73,6 +77,8 @@ public class Analytics extends Receiver<Analytics> implements Timers.Task
 			this.io.disconnect();
 			return;
 		}
+
+		this.playerId = packet.getInt(1);
 
 		Timers.subscribe(this, 5, 5, TimeUnit.MINUTES);
 	}
@@ -138,16 +144,41 @@ public class Analytics extends Receiver<Analytics> implements Timers.Task
 		}
 
 		Group info = ClanInfo.get(raw, mask);
+		Clan[] clans = new Clan[info.size()];
+
+		for (int i = 0; i < info.size(); i++)
+		{
+			Group element = info.getGroup(i);
+			clans[i] = Clan.fromInfo(element);
+		}
+
+		if (clans.length == 0)
+			return;
+
+		this.clanReceived(clans[0]);
+
+		ClansCache.getInstance().put(clans);
 	}
 
 	public void playerReceived(Player player)
 	{
-		if (this.player != null && this.player.id() != player.id())
+		if (this.playerId != player.id())
 		{
 			return;
 		}
 
 		this.player = player;
+		this.clanId = player.clanId();
+	}
+
+	public void clanReceived(Clan clan)
+	{
+		if (this.clanId != clan.id())
+		{
+			return;
+		}
+
+		this.clan = clan;
 	}
 
 	public void requestPlayer(byte type, long... nid)

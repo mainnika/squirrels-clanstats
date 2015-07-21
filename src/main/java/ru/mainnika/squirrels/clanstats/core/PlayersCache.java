@@ -1,6 +1,5 @@
 package ru.mainnika.squirrels.clanstats.core;
 
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayersCache

@@ -26,6 +26,66 @@ public class Player
 		return this.id;
 	}
 
+	public long netId()
+	{
+		return this.netId;
+	}
+
+	public byte netType()
+	{
+		return this.netType;
+	}
+
+	public String name()
+	{
+		return this.name;
+	}
+
+	public String photo()
+	{
+		return this.photo;
+	}
+
+	public String profile()
+	{
+		return this.profile;
+	}
+
+	public boolean isModerator()
+	{
+		return this.isModerator;
+	}
+
+	public boolean isEditor()
+	{
+		return this.isEditor;
+	}
+
+	public boolean isOnline()
+	{
+		return this.isOnline;
+	}
+
+	public boolean isVip()
+	{
+		return this.isVip;
+	}
+
+	public int squirrelExperience()
+	{
+		return this.squirrelExperience;
+	}
+
+	public int shamanExperience()
+	{
+		return this.shamanExperience;
+	}
+
+	public int clanId()
+	{
+		return this.clanId;
+	}
+
 	public int updated()
 	{
 		return this.updated;
