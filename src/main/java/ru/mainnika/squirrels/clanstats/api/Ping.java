@@ -1,5 +1,6 @@
 package ru.mainnika.squirrels.clanstats.api;
 
+import ru.mainnika.squirrels.clanstats.utils.DateTime;
 import ru.mainnika.squirrels.clanstats.utils.UnIdleService;
 
 import javax.servlet.ServletException;
@@ -18,7 +19,7 @@ public class Ping extends HttpServlet
 
 		UnIdleService.create().ping();
 
-		String result = String.format("{\"method\":\"ping\", \"timestamp\": %d}", (int) (System.currentTimeMillis() / 1000L));
+		String result = String.format("{\"method\":\"ping\", \"timestamp\": %d}", DateTime.getUnixtime());
 
 		out.print(result);
 	}

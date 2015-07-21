@@ -1,5 +1,7 @@
 package ru.mainnika.squirrels.clanstats.api;
 
+import ru.mainnika.squirrels.clanstats.utils.DateTime;
+
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
@@ -14,7 +16,7 @@ public class Hello extends HttpServlet
 	{
 		ServletOutputStream out = resp.getOutputStream();
 
-		String result = String.format("{\"method\":\"hello\", \"timestamp\": %d}", (int) (System.currentTimeMillis() / 1000L));
+		String result = String.format("{\"method\":\"hello\", \"timestamp\": %d}", DateTime.getUnixtime());
 
 		out.print(result);
 	}
