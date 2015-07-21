@@ -25,6 +25,7 @@ public class Analytics extends Receiver<Analytics> implements Timers.Task
 	}
 
 	private Credentials credentials;
+	private Player player;
 
 	public Analytics(Connection connection, Credentials credentials)
 	{
@@ -48,6 +49,7 @@ public class Analytics extends Receiver<Analytics> implements Timers.Task
 	public void onDisconnect()
 	{
 		Timers.unsubscribe(this);
+		this.player = null;
 	}
 
 	@Override
@@ -73,8 +75,6 @@ public class Analytics extends Receiver<Analytics> implements Timers.Task
 		}
 
 		Timers.subscribe(this, 5, 5, TimeUnit.MINUTES);
-
-		this.requestClan(116837, 100621);
 	}
 
 	public void onGuard(Packet packet) throws IOException
@@ -118,6 +118,11 @@ public class Analytics extends Receiver<Analytics> implements Timers.Task
 			players[i] = Player.fromInfo(element);
 		}
 
+		if (players.length == 0)
+			return;
+
+		this.playerReceived(players[0]);
+
 		PlayersCache.getInstance().put(players);
 	}
 
@@ -133,6 +138,16 @@ public class Analytics extends Receiver<Analytics> implements Timers.Task
 		}
 
 		Group info = ClanInfo.get(raw, mask);
+	}
+
+	public void playerReceived(Player player)
+	{
+		if (this.player != null && this.player.id() != player.id())
+		{
+			return;
+		}
+
+		this.player = player;
 	}
 
 	public void requestPlayer(byte type, long... nid)
