@@ -12,7 +12,7 @@ public enum Server
 	INFO(6, "AI"),
 	INFO_NET(7, "AI"),
 	ROOM(8, "BB[I]B"),
-	DATA(9, "I[I]"),
+	DATA(9, "[I]"),
 	RATINGS_COUNT(10, "[I]"),
 	RATING(11, "BI[II]"),
 	PLAY_WITH(12, "B,BBI"),
