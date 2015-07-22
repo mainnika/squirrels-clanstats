@@ -83,7 +83,7 @@ public class Packet extends Group
 		Group groupElement = new Group(Arrays.asList(args));
 		Group argsGroup = new Group(Collections.singletonList(groupElement));
 
-		ByteBuffer rawBuffer = writer(format, argsGroup);
+		ByteBuffer rawBuffer = writer(format, argsGroup, false);
 		Byte[] objectArray = ArrayUtils.toObject(rawBuffer.array());
 
 		Packet packet = new Packet(argsGroup);
@@ -199,7 +199,7 @@ public class Packet extends Group
 		return result;
 	}
 
-	public static ByteBuffer writer(String format, Group groups) throws IOException
+	public static ByteBuffer writer(String format, Group groups, boolean optional) throws IOException
 	{
 		ArrayList<ByteBuffer> buffers = new ArrayList<>();
 
@@ -214,6 +214,16 @@ public class Packet extends Group
 			while (formatOffset < format.length())
 			{
 				char symbol = format.charAt(formatOffset++);
+
+				if (symbol == ',')
+				{
+					optional = true;
+					continue;
+				}
+
+				if (objectsOffset == objects.size() && optional)
+					break;
+
 				Object object = objects.get(objectsOffset++);
 
 				switch (symbol)
@@ -235,7 +245,7 @@ public class Packet extends Group
 						rawSize.putInt(subGroup.size());
 
 						buffers.add(rawSize);
-						buffers.add(writer(subMask, subGroup));
+						buffers.add(writer(subMask, subGroup, optional));
 
 						formatOffset = next + 1;
 						break;
