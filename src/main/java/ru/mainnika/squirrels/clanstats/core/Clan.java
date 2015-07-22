@@ -90,6 +90,27 @@ public class Clan
 
 	}
 
+	public void fromOther(Clan other)
+	{
+		this.id = other.id;
+		this.leaderId = other.leaderId;
+		this.level = other.level;
+		this.experience = other.experience;
+		this.name = other.name;
+		this.photo = other.photo;
+		this.emblem = other.emblem;
+
+		if (other.statsDaily != null)
+		{
+			this.statsDaily = (HashMap) other.statsDaily.clone();
+		}
+
+		if (other.players != null)
+		{
+			this.players = (ArrayList) other.players.clone();
+		}
+	}
+
 	public static Clan fromInfo(Group info)
 	{
 		Clan clan = new Clan();

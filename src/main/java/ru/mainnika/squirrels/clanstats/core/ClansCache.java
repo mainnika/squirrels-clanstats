@@ -36,7 +36,7 @@ public class ClansCache
 				continue;
 			}
 
-			this.clans.replace(clan.id(), clan);
+			old.fromOther(clan);
 		}
 	}
 
