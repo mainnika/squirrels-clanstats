@@ -1,5 +1,7 @@
 package ru.mainnika.squirrels.clanstats.storage;
 
+import ru.mainnika.squirrels.clanstats.utils.Config;
+
 import java.io.IOException;
 import java.sql.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -61,9 +63,9 @@ public class Database
 		{
 		}
 
-		user = "root";
-		password = "";
-		url = "jdbc:mysql://localhost:3306/sqclanbase";
+		user = Config.dbUser();
+		password = Config.dbPassword();
+		url = Config.dbUrl();
 
 		available = new ConcurrentLinkedDeque<>();
 	}
@@ -77,7 +79,7 @@ public class Database
 
 	public int test() throws SQLException
 	{
-		log.info("Exec test");
+		log.info("Execute test");
 
 		String query = "SELECT COUNT(*) as `count` from `snapshots`";
 		PreparedStatement statement = this.sql.prepareStatement(query);

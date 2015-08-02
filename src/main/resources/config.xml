@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <Storage>
+        <Database>sqclanbase</Database>
+        <User>root</User>
+        <Password></Password>
+        <Host>localhost</Host>
+        <Port>3306</Port>
+    </Storage>
+</Config>
