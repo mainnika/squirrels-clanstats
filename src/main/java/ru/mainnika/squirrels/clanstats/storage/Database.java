@@ -1,9 +1,12 @@
 package ru.mainnika.squirrels.clanstats.storage;
 
+import ru.mainnika.squirrels.clanstats.analytics.AnalyticSnapshot;
+import ru.mainnika.squirrels.clanstats.analytics.AnalyticSnapshot.Snapshot;
 import ru.mainnika.squirrels.clanstats.utils.Config;
 
 import java.io.IOException;
 import java.sql.*;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.logging.Logger;
 
@@ -35,10 +38,10 @@ public class Database
 			return this.instance;
 		}
 
-		public void close() throws IOException
+		public void close()
 		{
 			if (this.instance == null)
-				throw new IOException("Guard already closed");
+				return;
 
 			available.addLast(this.instance);
 			this.instance = null;
@@ -89,5 +92,39 @@ public class Database
 		result.first();
 
 		return result.getInt("count");
+	}
+
+	public void saveSnapshot(AnalyticSnapshot snapshot) throws SQLException
+	{
+		log.info("Saving snapshots " + snapshot.name());
+
+		String query = "REPLACE INTO `snapshots` (`hash`, `type`, `id`, `data`, `value`) VALUES ";
+		String values = "";
+
+		List<Snapshot> unsaved = snapshot.getUnsaved();
+
+		for (int i = 0; i < unsaved.size(); i++)
+		{
+			Snapshot element = unsaved.get(i);
+
+			if (i > 0)
+			{
+				values += ",";
+			}
+
+			values += String.format("(%d, %d, %d, %d, %d)",
+				element.hash,
+				element.type,
+				element.id,
+				element.data,
+				element.value
+			);
+		}
+
+		Statement statement = this.sql.createStatement();
+		int saved = statement.executeUpdate(query + values);
+		log.info("Saved snapshots: " + Integer.toString(saved));
+
+		snapshot.clearUnsaved();
 	}
 }
