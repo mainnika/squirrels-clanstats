@@ -4,7 +4,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayersCache
 {
-
 	private static final PlayersCache instance;
 
 	static

@@ -4,7 +4,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ClansCache
 {
-
 	private static final ClansCache instance;
 
 	static

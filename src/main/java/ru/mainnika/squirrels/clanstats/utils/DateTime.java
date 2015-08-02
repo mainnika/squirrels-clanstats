@@ -9,4 +9,9 @@ public class DateTime
 	{
 		return (int) (System.currentTimeMillis() / 1000L);
 	}
+
+	public static int getUnixhour()
+	{
+		return getUnixtime() / 3600;
+	}
 }
