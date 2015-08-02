@@ -27,6 +27,13 @@ public class Database
 				return;
 			}
 
+			if (this.instance.sql.isClosed())
+			{
+				log.info("Creating new Database instance");
+				this.instance = new Database();
+				return;
+			}
+
 			log.info("Getting existing Database instance");
 		}
 
