@@ -28,8 +28,8 @@ public abstract class Savable
 		}
 	}
 
-	static ConcurrentLinkedQueue<Savable> savables;
-	static Saver saver;
+	private static ConcurrentLinkedQueue<Savable> savables;
+	private static Saver saver;
 
 	static
 	{
