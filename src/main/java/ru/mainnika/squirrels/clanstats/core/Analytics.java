@@ -22,6 +22,8 @@ public class Analytics extends Receiver<Analytics> implements Timers.Task
 	static
 	{
 		log = Logger.getLogger(Connection.class.getName());
+
+		ru.mainnika.squirrels.clanstats.analytics.Analytics.CLAN_MEMBERS_HOURLY.instance();
 	}
 
 	private int playerId;

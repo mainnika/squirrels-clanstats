@@ -6,6 +6,7 @@ import ru.mainnika.squirrels.clanstats.utils.Config;
 
 import java.io.IOException;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.logging.Logger;
@@ -99,6 +100,30 @@ public class Database
 		result.first();
 
 		return result.getInt("count");
+	}
+
+	public void loadSnapshot(AnalyticSnapshot snapshot) throws SQLException
+	{
+		String query = "SELECT `hash`, `type`, `id`, `data`, `value` FROM `snapshots` ORDER BY `hash`, `type`";
+		Statement statement = this.sql.createStatement();
+
+		ResultSet result = statement.executeQuery(query);
+		ArrayList<Snapshot> snapshots = new ArrayList<>();
+
+		while (result.next())
+		{
+			Snapshot element = new Snapshot();
+
+			element.hash = result.getInt("hash");
+			element.type = result.getInt("type");
+			element.id = result.getInt("id");
+			element.data = result.getInt("data");
+			element.value = result.getInt("value");
+
+			snapshots.add(element);
+		}
+
+		snapshot.setSnapshots(snapshots);
 	}
 
 	public void saveSnapshot(AnalyticSnapshot snapshot) throws SQLException

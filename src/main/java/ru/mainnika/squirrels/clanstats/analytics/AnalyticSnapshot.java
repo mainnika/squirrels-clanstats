@@ -49,6 +49,8 @@ public abstract class AnalyticSnapshot extends Savable
 
 	public abstract void clearUnsaved();
 
+	public abstract void setSnapshots(List<Snapshot> snapshots);
+
 	public abstract List<Snapshot> getUnsaved();
 
 	public abstract List<Snapshot> getSnapshots();

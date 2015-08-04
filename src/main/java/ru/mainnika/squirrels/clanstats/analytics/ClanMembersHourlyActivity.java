@@ -1,6 +1,7 @@
 package ru.mainnika.squirrels.clanstats.analytics;
 
 import ru.mainnika.squirrels.clanstats.core.Clan;
+import ru.mainnika.squirrels.clanstats.storage.Database;
 import ru.mainnika.squirrels.clanstats.utils.DateTime;
 
 import java.util.*;
@@ -16,6 +17,24 @@ public class ClanMembersHourlyActivity extends AnalyticSnapshot
 
 		this.set = new HashSet<>();
 		this.unsaved = new HashSet<>();
+
+		Database.Guard guard = null;
+		Database base = null;
+		try
+		{
+			guard = new Database.Guard();
+			base = guard.get();
+
+			base.loadSnapshot(this);
+
+		} catch (Exception ignored)
+		{
+		} finally
+		{
+			if (guard != null)
+				guard.close();
+		}
+
 	}
 
 	@Override
@@ -66,6 +85,13 @@ public class ClanMembersHourlyActivity extends AnalyticSnapshot
 	public List<Snapshot> getUnsaved()
 	{
 		return new ArrayList<>(this.unsaved);
+	}
+
+	@Override
+	public void setSnapshots(List<Snapshot> snapshots)
+	{
+		this.set.clear();
+		this.set.addAll(snapshots);
 	}
 
 	@Override
