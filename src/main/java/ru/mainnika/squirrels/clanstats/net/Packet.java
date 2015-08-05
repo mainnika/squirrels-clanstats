@@ -319,11 +319,13 @@ public class Packet extends Group
 
 						String string = (String) object;
 
-						ByteBuffer rawString = ByteBuffer.allocate(string.length() + 2 + 1);
+						byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
+
+						ByteBuffer rawString = ByteBuffer.allocate(bytes.length + 2 + 1);
 
 						rawString.order(ByteOrder.LITTLE_ENDIAN);
-						rawString.putShort((short) string.length());
-						rawString.put(string.getBytes(StandardCharsets.UTF_8));
+						rawString.putShort((short) bytes.length);
+						rawString.put(bytes);
 						rawString.put((byte) 0);
 
 						buffers.add(rawString);
