@@ -77,7 +77,7 @@ public class ChatBot
 		}
 
 		String picture = (String) ((NativeObject) ((NativeArray) object).get(0)).get("preview");
-		this.owner.clanChat(String.format("<img&#0;src='' height='100' width='100' src='%s%s' >", "http://media.oboobs.ru/", picture));
+		this.owner.clanChat(String.format("<img&#0;src='' height='100' width='100' src='%s%s' >", "//proxypass.azurewebsites.net/?http://media.oboobs.ru/", picture));
 	}
 
 
