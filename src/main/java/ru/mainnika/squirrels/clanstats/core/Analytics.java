@@ -26,9 +26,18 @@ public class Analytics extends Receiver<Analytics> implements Timers.Task
 		ru.mainnika.squirrels.clanstats.analytics.Analytics.CLAN_MEMBERS_HOURLY.instance();
 	}
 
+	private enum ChatType
+	{
+		ROOM,
+		CLAN,
+		COMMON,
+		NEWBIE;
+	}
+
 	private int playerId;
 	private int clanId;
 
+	private ChatBot chatBot;
 	private Credentials credentials;
 	private Player player;
 	private Clan clan;
@@ -45,8 +54,11 @@ public class Analytics extends Receiver<Analytics> implements Timers.Task
 		this.on(Server.CLAN_INFO, "onClanInfo");
 		this.on(Server.CLAN_BALANCE, "onClanBalance");
 		this.on(Server.CLAN_MEMBERS, "onClanMembers");
+		this.on(Server.CHAT_MESSAGE, "onChatMessage");
 
 		this.credentials = credentials;
+
+		this.chatBot = new ChatBot(this);
 	}
 
 	public void onConnect()
@@ -88,6 +100,8 @@ public class Analytics extends Receiver<Analytics> implements Timers.Task
 		}
 
 		this.playerId = packet.getInt(1);
+
+		this.sendPacket(Client.CHAT_ENTER);
 
 		Timers.subscribe(this, 1, 1, TimeUnit.MINUTES);
 	}
@@ -205,6 +219,21 @@ public class Analytics extends Receiver<Analytics> implements Timers.Task
 		clan.setPlayers(packet.getGroup(1));
 	}
 
+	public void onChatMessage(Packet packet) throws IOException
+	{
+		ChatType chatType = ChatType.values()[packet.getByte(0)];
+		int playerId = packet.getInt(1);
+		String message = packet.getString(2);
+
+		if (chatType != ChatType.CLAN)
+			return;
+
+		if (message.charAt(0) != '/')
+			return;
+
+		this.chatBot.request(message.substring(1));
+	}
+
 	public void playerReceived(Player player)
 	{
 		if (this.playerId != player.id())
@@ -239,5 +268,10 @@ public class Analytics extends Receiver<Analytics> implements Timers.Task
 	public void requestClan(int... uid)
 	{
 		this.sendPacket(Client.CLAN_REQUEST, Group.make(uid), 0xFFFFFFFF);
+	}
+
+	public void clanChat(String message)
+	{
+		this.sendPacket(Client.CHAT_MESSAGE, (byte)1, message);
 	}
 }
