@@ -9,7 +9,7 @@ import java.nio.ByteOrder;
 public enum ClanInfo
 {
 	ID(0, "I"),
-	INFO(1, "SSS"),
+	INFO(1 << 0, "SSS"),
 	NEWS(1 << 1, "S"),
 	LEADER_ID(1 << 2, "I"),
 	SIZE(1 << 3, "I"),
@@ -17,15 +17,14 @@ public enum ClanInfo
 	RANK(1 << 5, "BII"),
 	RANK_RANGE(1 << 6, "I"),
 	PLACES(1 << 7, "I"),
-	RATING(1 << 8, "II"),
-	BAN(1 << 9, "I"),
-	TOTEMS(1 << 10, "[BIB]I"),
-	TOTEMS_RANGS(1 << 11, "[BBII]"),
-	TOTEMS_BONUSES(1 << 12, "[BB]"),
-	STATISICS(1 << 13, "[III]"),
-	BLACKLIST(1 << 14, "[I]"),
-	LEVEL_LIMITER(1 << 15, "B"),
-	ADMIN_BALANCE(1 << 16, "II");
+	BAN(1 << 8, "I"),
+	TOTEMS(1 << 9, "[BIB]I"),
+	TOTEMS_RANGS(1 << 10, "[BBII]"),
+	TOTEMS_BONUSES(1 << 11, "[BB]"),
+	STATISICS(1 << 12, "[III]"),
+	BLACKLIST(1 << 13, "[I]"),
+	LEVEL_LIMITER(1 << 14, "B"),
+	ADMIN_BALANCE(1 << 15, "II");
 
 	private Integer offset;
 	private String mask;
