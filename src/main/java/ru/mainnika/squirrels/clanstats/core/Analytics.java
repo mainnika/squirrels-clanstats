@@ -2,9 +2,7 @@ package ru.mainnika.squirrels.clanstats.core;
 
 import ru.mainnika.squirrels.clanstats.net.Connection;
 import ru.mainnika.squirrels.clanstats.net.Group;
-import ru.mainnika.squirrels.clanstats.net.Packet;
 import ru.mainnika.squirrels.clanstats.net.Receiver;
-import ru.mainnika.squirrels.clanstats.net.packets.ClanInfoParser;
 import ru.mainnika.squirrels.clanstats.net.packets.ClientParser;
 import ru.mainnika.squirrels.clanstats.net.packets.server.*;
 import ru.mainnika.squirrels.clanstats.utils.GuardSolver;
@@ -132,9 +130,6 @@ public class Analytics extends Receiver implements Timers.Task
 		{
 			ClanInfo.Info element = packet.getInfoElement(i);
 			clans[i] = Clan.createFromInfo(element);
-
-//                      TODO:
-//			this.sendPacket(ClientParser.CLAN_GET_MEMBERS, clans[i].id());
 		}
 
 		if (clans.length == 0)
@@ -175,7 +170,7 @@ public class Analytics extends Receiver implements Timers.Task
 			playersForRequest[i] = players.getGroup(i).getInt(0);
 		}
 
-		this.requestPlayer(playersForRequest);
+		this.requestPlayers(playersForRequest);
 		clan.setPlayers(players);
 	}
 
@@ -203,6 +198,8 @@ public class Analytics extends Receiver implements Timers.Task
 
 		this.player = player;
 		this.clanId = player.clanId();
+
+		this.requestClans(this.clanId);
 	}
 
 	public void clanReceived(Clan clan)
@@ -222,23 +219,28 @@ public class Analytics extends Receiver implements Timers.Task
 
 		if (this.clan != null)
 		{
-			this.requestClan(this.clan.id());
+			this.requestClans(this.clan.id());
 		}
 	}
 
-	public void requestPlayer(byte type, long... nid)
+	public void requestPlayers(byte type, long... nid)
 	{
 		this.sendPacket(ClientParser.REQUEST_NET, Group.make(nid), type, PlayerInfo.FULL_MASK);
 	}
 
-	public void requestPlayer(int... uid)
+	public void requestPlayers(int... uids)
 	{
-		this.sendPacket(ClientParser.REQUEST, Group.make(uid), PlayerInfo.FULL_MASK);
+		this.sendPacket(ClientParser.REQUEST, Group.make(uids), PlayerInfo.FULL_MASK);
 	}
 
-	public void requestClan(int... uid)
+	public void requestClans(int... uids)
 	{
-		this.sendPacket(ClientParser.CLAN_REQUEST, Group.make(uid), ClanInfo.FULL_MASK);
+		this.sendPacket(ClientParser.CLAN_REQUEST, Group.make(uids), ClanInfo.FULL_MASK);
+
+		for (int uid : uids)
+		{
+			this.sendPacket(ClientParser.CLAN_GET_MEMBERS, uid);
+		}
 	}
 
 	public void clanChat(String message)
