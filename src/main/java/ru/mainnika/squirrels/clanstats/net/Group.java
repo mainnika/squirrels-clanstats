@@ -78,11 +78,11 @@ public class Group extends ArrayList<Object>
 		return result;
 	}
 
-	public static Group make(short... byteArray)
+	public static Group make(short... shortArray)
 	{
-		Group result = new Group(byteArray.length);
+		Group result = new Group(shortArray.length);
 
-		for (short aByte : byteArray)
+		for (short aByte : shortArray)
 		{
 			result.add((new Group(1)).add(aByte));
 		}
@@ -90,11 +90,11 @@ public class Group extends ArrayList<Object>
 		return result;
 	}
 
-	public static Group make(int... byteArray)
+	public static Group make(int... intArray)
 	{
-		Group result = new Group(byteArray.length);
+		Group result = new Group(intArray.length);
 
-		for (int aByte : byteArray)
+		for (int aByte : intArray)
 		{
 			result.add((new Group(1)).addReturn(aByte));
 		}
@@ -102,11 +102,11 @@ public class Group extends ArrayList<Object>
 		return result;
 	}
 
-	public static Group make(long... byteArray)
+	public static Group make(long... longArray)
 	{
-		Group result = new Group(byteArray.length);
+		Group result = new Group(longArray.length);
 
-		for (long aByte : byteArray)
+		for (long aByte : longArray)
 		{
 			result.add((new Group(1)).add(aByte));
 		}
@@ -114,17 +114,18 @@ public class Group extends ArrayList<Object>
 		return result;
 	}
 
-	public static Group make(Object... byteArray)
-	{
-		Group result = new Group(byteArray.length);
-
-		for (Object aByte : byteArray)
-		{
-			result.add((new Group(1)).add(aByte));
-		}
-
-		return result;
-	}
+//      TODO:
+//	public static Group make(Object... objectArray)
+//	{
+//		Group result = new Group(objectArray.length);
+//
+//		for (Object aByte : objectArray)
+//		{
+//			result.add((new Group(1)).add(aByte));
+//		}
+//
+//		return result;
+//	}
 
 	public static Group element(Object... objectArray)
 	{

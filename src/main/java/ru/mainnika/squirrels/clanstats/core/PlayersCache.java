@@ -35,7 +35,7 @@ public class PlayersCache
 				continue;
 			}
 
-			this.players.replace(player.id(), player);
+			old.updateFromPlayer(player);
 		}
 	}
 

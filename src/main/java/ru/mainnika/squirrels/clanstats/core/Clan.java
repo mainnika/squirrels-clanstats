@@ -1,6 +1,7 @@
 package ru.mainnika.squirrels.clanstats.core;
 
 import ru.mainnika.squirrels.clanstats.net.Group;
+import ru.mainnika.squirrels.clanstats.net.packets.server.ClanInfo;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -9,12 +10,12 @@ import java.util.Map;
 
 public class Clan
 {
-	private int id;
-	private int leaderId;
-	private int level;
-	private int experience;
-	private int coins;
-	private int nuts;
+	private Integer id;
+	private Integer leaderId;
+	private Byte level;
+	private Integer experience;
+	private Integer coins;
+	private Integer nuts;
 
 	private String name;
 	private String photo;
@@ -120,21 +121,21 @@ public class Clan
 		}
 	}
 
-	public static Clan fromInfo(Group info)
+	public static Clan createFromInfo(ClanInfo.Info info)
 	{
 		Clan clan = new Clan();
 
-		clan.id = info.getInt(0);
-		clan.leaderId = info.getInt(5);
-		clan.level = info.getByte(8);
-		clan.experience = info.getInt(9);
+		clan.id = info.id();
+		clan.leaderId = info.leaderId();
+		clan.level = info.level();
+		clan.experience = info.experience();
 
-		clan.name = info.getString(1);
-		clan.photo = info.getString(2);
-		clan.emblem = info.getString(3);
+		clan.name = info.name();
+		clan.photo = info.photo();
+		clan.emblem = info.emblem();
 
 		clan.statsDaily = new HashMap<>();
-		Group stats = info.getGroup(20);
+		Group stats = info.stats();
 		for (int i = 0; i < stats.size(); i++)
 		{
 			Group element = stats.getGroup(i);

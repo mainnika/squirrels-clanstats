@@ -1,8 +1,8 @@
 package ru.mainnika.squirrels.clanstats.net;
 
 import org.apache.commons.lang3.ArrayUtils;
-import ru.mainnika.squirrels.clanstats.net.packets.Client;
-import ru.mainnika.squirrels.clanstats.net.packets.Server;
+import ru.mainnika.squirrels.clanstats.net.packets.ClientParser;
+import ru.mainnika.squirrels.clanstats.net.packets.ServerParser;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -65,7 +65,7 @@ public class Connection implements Runnable
 
 		short type = wrapped_data.getShort();
 
-		Server format = Server.getById(type);
+		ServerParser format = ServerParser.getById(type);
 
 		if (format == null)
 		{
@@ -77,12 +77,20 @@ public class Connection implements Runnable
 
 		log.info("Received packet " + format);
 
-		Packet packet = Packet.make(format.mask(), format.id(), packetRaw);
+		Packet packet = Packet.make(format.mask(), format.id(), format.specialize(), packetRaw);
 
-		if (this.receiver != null)
+		if (packet == null)
 		{
-			this.receiver.onPacket(packet);
+			log.warning("Cannot parse handler for " + type);
+			return;
 		}
+
+		if (this.receiver == null)
+		{
+			return;
+		}
+
+		this.receiver.onPacket(packet);
 	}
 
 	private void receiver() throws IOException
@@ -147,7 +155,7 @@ public class Connection implements Runnable
 		throw new IOException("Disconnected");
 	}
 
-	public void send(Client format, Object... args) throws IOException
+	public void send(ClientParser format, Object... args) throws IOException
 	{
 		Packet packet = Packet.make(format.mask(), format.id(), args);
 		Byte[] rawPacket = packet.getRaw();

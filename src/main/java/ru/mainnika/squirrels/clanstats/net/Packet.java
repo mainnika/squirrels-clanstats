@@ -3,6 +3,7 @@ package ru.mainnika.squirrels.clanstats.net;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
@@ -24,17 +25,12 @@ public class Packet extends Group
 	private List<Byte> raw;
 	private short id;
 
-	private Packet(String format, ByteBuffer buffer)
-	{
-		super(parser(format, buffer, 1, false).getGroup(0));
-	}
-
-	private Packet(Group argsGroup) throws IOException
+	protected Packet(Group argsGroup) throws IOException
 	{
 		super(argsGroup);
 	}
 
-	private static int find_closing_bracket(String mask, int fromIndex)
+	private static int findClosingBracket(String mask, int fromIndex)
 	{
 		int left = 0;
 		int right = 0;
@@ -65,15 +61,23 @@ public class Packet extends Group
 		return -1;
 	}
 
-	public static Packet make(String format, short id, byte[] raw)
+	public static Packet make(String format, short id, Class specialize, byte[] raw)
 	{
 		ByteBuffer buffer = ByteBuffer.wrap(raw);
-
 		buffer.order(ByteOrder.LITTLE_ENDIAN);
 
-		Packet packet = new Packet(format, buffer);
+		Packet packet = null;
 
-		packet.id = id;
+		if (specialize == null)
+			return packet;
+
+		try
+		{
+			packet = (Packet) specialize.getConstructor(String.class, ByteBuffer.class).newInstance(format, buffer);
+			packet.id = id;
+		} catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException ignored)
+		{
+		}
 
 		return packet;
 	}
@@ -114,7 +118,7 @@ public class Packet extends Group
 				{
 					case '[':
 					{
-						int next = find_closing_bracket(format, formatOffset);
+						int next = findClosingBracket(format, formatOffset);
 						int subGroupLen = raw.getInt();
 						String subMask = format.substring(formatOffset, next);
 
@@ -235,7 +239,7 @@ public class Packet extends Group
 							throw new IOException("Invalid format, ArrayList required");
 						}
 
-						int next = find_closing_bracket(format, formatOffset);
+						int next = findClosingBracket(format, formatOffset);
 						String subMask = format.substring(formatOffset, next);
 						Group subGroup = (Group) object;
 

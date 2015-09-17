@@ -1,17 +1,15 @@
 package ru.mainnika.squirrels.clanstats.net;
 
-import ru.mainnika.squirrels.clanstats.net.packets.Client;
-import ru.mainnika.squirrels.clanstats.net.packets.Server;
+import ru.mainnika.squirrels.clanstats.net.packets.ClientParser;
+import ru.mainnika.squirrels.clanstats.net.packets.ServerParser;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.logging.Logger;
 
-public abstract class Receiver<Consumer>
+public abstract class Receiver
 {
 	private static final Logger log;
-	private final HashMap<Server, Method> handlers;
 
 	static
 	{
@@ -22,7 +20,6 @@ public abstract class Receiver<Consumer>
 
 	public Receiver(Connection connection)
 	{
-		this.handlers = new HashMap<>();
 		this.io = connection;
 		this.io.setReceiver(this);
 	}
@@ -34,12 +31,14 @@ public abstract class Receiver<Consumer>
 	public void onPacket(Packet packet)
 	{
 		short id = packet.getId();
-		Server format = Server.getById(id);
-		Method method = handlers.get(format);
+		ServerParser format = ServerParser.getById(id);
+		Class specialize = format.specialize();
+		Method method = null;
 
 		try
 		{
-			method.invoke((Consumer) this, packet);
+			method = this.getClass().getMethod("onPacket", specialize);
+			method.invoke(this, packet);
 		} catch (Exception e)
 		{
 			if (method == null)
@@ -52,7 +51,7 @@ public abstract class Receiver<Consumer>
 		}
 	}
 
-	public void sendPacket(Client format, Object... args)
+	public void sendPacket(ClientParser format, Object... args)
 	{
 		try
 		{
@@ -62,16 +61,4 @@ public abstract class Receiver<Consumer>
 			log.warning("IO error " + e.getMessage());
 		}
 	}
-
-	public void on(Server format, String method)
-	{
-		try
-		{
-			this.handlers.put(format, ((Consumer) this).getClass().getMethod(method, Packet.class));
-		} catch (NoSuchMethodException e)
-		{
-			log.warning("Can not register handler " + method + " (" + e.getMessage() + ")");
-		}
-	}
-
 }

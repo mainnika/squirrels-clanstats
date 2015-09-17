@@ -14,6 +14,14 @@ import java.net.URL;
 
 public class ChatBot
 {
+	public enum ChatType
+	{
+		ROOM,
+		CLAN,
+		COMMON,
+		NEWBIE;
+	}
+
 	Analytics owner;
 
 	ChatBot(Analytics owner)
