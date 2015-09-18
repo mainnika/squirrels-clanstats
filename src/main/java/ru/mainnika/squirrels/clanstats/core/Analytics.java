@@ -247,4 +247,14 @@ public class Analytics extends Receiver implements Timers.Task
 	{
 		this.sendPacket(ClientParser.CHAT_MESSAGE, (byte) 1, message);
 	}
+
+	public int clanId()
+	{
+		return this.clanId;
+	}
+
+	public int playerId()
+	{
+		return this.playerId;
+	}
 }

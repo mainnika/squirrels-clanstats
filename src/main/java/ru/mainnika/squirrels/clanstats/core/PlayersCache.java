@@ -39,4 +39,9 @@ public class PlayersCache
 		}
 	}
 
+	public synchronized Player get(int playerId)
+	{
+		return this.players.get(playerId);
+	}
+
 }

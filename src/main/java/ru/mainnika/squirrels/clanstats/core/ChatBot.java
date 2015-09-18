@@ -4,6 +4,7 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.json.JsonParser;
+import ru.mainnika.squirrels.clanstats.analytics.AnalyticSnapshot;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 public class ChatBot
 {
@@ -33,14 +35,62 @@ public class ChatBot
 	{
 		switch (command)
 		{
+			case "hello":
+				hello();
+				break;
+
 			case "boobs":
 				boobs();
 				break;
 
+			case "stats":
+				stats();
+				break;
+
 			default:
-				owner.clanChat("[error]: unknown command");
+				error();
 				break;
 		}
+	}
+
+	private void hello() throws IOException
+	{
+		this.owner.clanChat("[hello]: hello!");
+	}
+
+	private void stats() throws IOException
+	{
+		List<AnalyticSnapshot.Snapshot> last = ru.mainnika.squirrels.clanstats.analytics.Analytics.CLAN_MEMBERS_HOURLY.instance().getLast(this.owner.clanId());
+
+		if (last == null || last.isEmpty())
+		{
+			this.owner.clanChat("[stats]: stats is empty");
+			return;
+		}
+
+		Integer hour = last.get(0).hash;
+		this.owner.clanChat("[stats]: last hour = " + hour);
+
+		for (AnalyticSnapshot.Snapshot snapshot : last)
+		{
+			Integer playerId = snapshot.data;
+			Integer playerValue = snapshot.value;
+			String playerName = playerId.toString();
+
+			Player player = PlayersCache.getInstance().get(playerId);
+
+			if (player != null)
+			{
+				playerName = player.name();
+			}
+
+			this.owner.clanChat(playerName + " -> " + playerValue);
+		}
+	}
+
+	private void error() throws IOException
+	{
+		owner.clanChat("[error]: unknown command");
 	}
 
 	private void boobs() throws IOException
