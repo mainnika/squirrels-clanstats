@@ -13,7 +13,11 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 public class ChatBot
 {
@@ -22,7 +26,7 @@ public class ChatBot
 		ROOM,
 		CLAN,
 		COMMON,
-		NEWBIE;
+		NEWBIE
 	}
 
 	Analytics owner;
@@ -70,7 +74,21 @@ public class ChatBot
 		}
 
 		Integer hour = last.get(0).hash;
-		this.owner.clanChat("[stats]: " + DateTime.fromUnixhour(hour));
+
+		Date date = DateTime.fromUnixhour(hour);
+		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm dd.MM.yyyy");
+		sdf.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
+
+		this.owner.clanChat("[stats]: " + sdf.format(date));
+
+		last.sort(new Comparator<AnalyticSnapshot.Snapshot>()
+		{
+			@Override
+			public int compare(AnalyticSnapshot.Snapshot o1, AnalyticSnapshot.Snapshot o2)
+			{
+				return o2.value - o1.value;
+			}
+		});
 
 		for (AnalyticSnapshot.Snapshot snapshot : last)
 		{
@@ -85,7 +103,7 @@ public class ChatBot
 				playerName = player.name();
 			}
 
-			this.owner.clanChat(playerName + " -> " + playerValue);
+			this.owner.clanChat(playerName + " ---- > " + playerValue);
 		}
 	}
 

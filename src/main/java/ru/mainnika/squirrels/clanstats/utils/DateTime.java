@@ -16,6 +16,6 @@ public class DateTime
 
 	public static Date fromUnixhour(int unixhour)
 	{
-		return new Date((long)unixhour*3600000);
+		return new Date((long) unixhour * 3600000);
 	}
 }
