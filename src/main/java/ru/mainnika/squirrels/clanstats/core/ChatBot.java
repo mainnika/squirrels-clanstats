@@ -5,6 +5,7 @@ import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.json.JsonParser;
 import ru.mainnika.squirrels.clanstats.analytics.AnalyticSnapshot;
+import ru.mainnika.squirrels.clanstats.utils.DateTime;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -69,7 +70,7 @@ public class ChatBot
 		}
 
 		Integer hour = last.get(0).hash;
-		this.owner.clanChat("[stats]: last hour = " + hour);
+		this.owner.clanChat("[stats]: " + DateTime.fromUnixhour(hour));
 
 		for (AnalyticSnapshot.Snapshot snapshot : last)
 		{

@@ -1,8 +1,7 @@
 package ru.mainnika.squirrels.clanstats.utils;
 
-/**
- * Created by mainn_000 on 7/21/2015.
- */
+import java.util.Date;
+
 public class DateTime
 {
 	public static int getUnixtime()
@@ -13,5 +12,10 @@ public class DateTime
 	public static int getUnixhour()
 	{
 		return getUnixtime() / 3600;
+	}
+
+	public static Date fromUnixhour(int unixhour)
+	{
+		return new Date((long)unixhour*3600000);
 	}
 }
