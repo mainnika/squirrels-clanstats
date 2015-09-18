@@ -4,6 +4,7 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.json.JsonParser;
+import ru.mainnika.squirrels.clanstats.Main;
 import ru.mainnika.squirrels.clanstats.analytics.AnalyticSnapshot;
 import ru.mainnika.squirrels.clanstats.utils.DateTime;
 
@@ -44,6 +45,10 @@ public class ChatBot
 				hello();
 				break;
 
+			case "debug":
+				debug();
+				break;
+
 			case "boobs":
 				boobs();
 				break;
@@ -61,6 +66,18 @@ public class ChatBot
 	private void hello() throws IOException
 	{
 		this.owner.clanChat("[hello]: hello!");
+	}
+
+	private void debug() throws IOException
+	{
+		String[] debugs = Main.getVersion().split("\n");
+
+		this.owner.clanChat("[debug]:");
+
+		for (String line : debugs)
+		{
+			this.owner.clanChat(line);
+		}
 	}
 
 	private void stats() throws IOException

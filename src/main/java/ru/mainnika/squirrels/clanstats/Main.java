@@ -11,6 +11,9 @@ import javax.servlet.ServletContextListener;
 
 public class Main implements ServletContextListener
 {
+	public static final String VERSION_MAJ = "0";
+	public static final String VERSION_MIN = "31";
+
 	private Connection net;
 	private Credentials cred;
 	private Analytics analytics;
@@ -36,5 +39,16 @@ public class Main implements ServletContextListener
 
 		UnIdleService.destroy();
 		Timers.destroy();
+	}
+
+	public static String getVersion()
+	{
+		return "CORE: " + VERSION_MAJ + "." + VERSION_MIN + "\n"
+			+ "JAVA: " + System.getProperty("java.vm.name") + " " + System.getProperty("java.runtime.version") + "\n"
+			+ "VENDOR: " + System.getProperty("java.vm.vendor") + "\n"
+			+ "OS: " + System.getProperty("os.name") + "\n"
+			+ "ARCH: " + System.getProperty("os.arch") + "\n"
+			+ "ZONE: " + System.getProperty("user.timezone") + "\n"
+		;
 	}
 }
