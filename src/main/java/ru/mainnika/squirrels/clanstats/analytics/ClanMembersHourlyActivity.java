@@ -8,14 +8,14 @@ import java.util.*;
 
 public class ClanMembersHourlyActivity extends AnalyticSnapshot
 {
-	private HashSet<Snapshot> set;
+	private TreeMap<Integer, HashSet<Snapshot>> snapshots;
 	private HashSet<Snapshot> unsaved;
 
 	public ClanMembersHourlyActivity()
 	{
 		super("ClanMembersHourlyActivity");
 
-		this.set = new HashSet<>();
+		this.snapshots = new TreeMap<>();
 		this.unsaved = new HashSet<>();
 
 		Database.Guard guard = null;
@@ -67,8 +67,17 @@ public class ClanMembersHourlyActivity extends AnalyticSnapshot
 			snapshot.data = pair.getKey();
 			snapshot.value = pair.getValue().getKey();
 
-			set.remove(snapshot);
-			set.add(snapshot);
+			Integer hour = snapshot.hash;
+			HashSet<Snapshot> storage = this.snapshots.get(hour);
+
+			if (storage == null)
+			{
+				storage = new HashSet<Snapshot>();
+				this.snapshots.put(hour, storage);
+			}
+
+			storage.remove(snapshot);
+			storage.add(snapshot);
 
 			unsaved.remove(snapshot);
 			unsaved.add(snapshot);
@@ -78,7 +87,8 @@ public class ClanMembersHourlyActivity extends AnalyticSnapshot
 	@Override
 	public List<Snapshot> getSnapshots()
 	{
-		return new ArrayList<>(this.set);
+//		TODO:
+		return null;
 	}
 
 	@Override
@@ -88,10 +98,46 @@ public class ClanMembersHourlyActivity extends AnalyticSnapshot
 	}
 
 	@Override
-	public void setSnapshots(List<Snapshot> snapshots)
+	public List<Snapshot> getLast(int id)
 	{
-		this.set.clear();
-		this.set.addAll(snapshots);
+		Map.Entry<Integer, HashSet<Snapshot>> last = this.snapshots.lastEntry();
+		ArrayList<Snapshot> result = new ArrayList<>();
+
+		if (last == null)
+			return result;
+
+		Integer hour = last.getKey();
+		HashSet<Snapshot> storage = last.getValue();
+
+		for (Snapshot snapshot : storage)
+		{
+			if (snapshot.type != Analytics.CLAN_MEMBERS_HOURLY.type() || snapshot.id != id)
+				continue;
+
+			result.add(snapshot);
+		}
+
+		return result;
+	}
+
+	@Override
+	public synchronized void setSnapshots(List<Snapshot> snapshots)
+	{
+		this.snapshots.clear();
+
+		for (Snapshot snapshot : snapshots)
+		{
+			Integer hour = snapshot.hash;
+			HashSet<Snapshot> storage = this.snapshots.get(hour);
+
+			if (storage == null)
+			{
+				storage = new HashSet<Snapshot>();
+				this.snapshots.put(hour, storage);
+			}
+
+			storage.add(snapshot);
+		}
 	}
 
 	@Override

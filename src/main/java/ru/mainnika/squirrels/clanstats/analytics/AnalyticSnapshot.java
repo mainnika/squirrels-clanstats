@@ -55,6 +55,8 @@ public abstract class AnalyticSnapshot extends Savable
 
 	public abstract List<Snapshot> getSnapshots();
 
+	public abstract List<Snapshot> getLast(int id);
+
 	public String name()
 	{
 		return this.name;
