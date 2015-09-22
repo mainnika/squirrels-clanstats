@@ -6,13 +6,13 @@ import java.util.HashMap;
 
 public enum ServerParser
 {
-	HELLO(1, "", Hello.class),
-	GUARD(2, "A", Guard.class),
+	HELLO(1, ""),
+	GUARD(2, "A"),
 	ADMIN_INFO(3, "IIIIIII[BB][BB]BBII[B]I[BI]B[BBBI]WWB"),
 	ADMIN_MESSAGE(4, "S"),
-	LOGIN(5, "B,IIIBBSIIII[B]I[W]BB[BI][BBB]I", Login.class),
-	INFO(6, "AI", PlayerInfo.class),
-	INFO_NET(7, "AI", PlayerInfo.class),
+	LOGIN(5, "B,IIIBBSIIII[B]I[W]BB[BI][BBB]I"),
+	INFO(6, "AI"),
+	INFO_NET(7, "AI"),
 	ROOM(8, "BB[I]B"),
 	ONLINE(9, "[I]"),
 	PLAY_WITH(10, "B,BBI"),
@@ -57,7 +57,7 @@ public enum ServerParser
 	GIFTS_ACCEPT(49, "BI,B"),
 	DEFERRED_BONUS(50, "[IBIIWWI]"),
 	DEFERRED_BONUS_ACCEPT(51, "BI,BWWI"),
-	CHAT_MESSAGE(52, "BIS", ChatMessage.class),
+	CHAT_MESSAGE(52, "BIS"),
 	CHAT_HISTORY(53, "B[IS]"),
 	COLLECTION_ASSEMBLE(54, "BBB"),
 	COLLECTION_EXCHANGE(55, "BIIBB"),
@@ -94,11 +94,11 @@ public enum ServerParser
 	MAPS_ID(86, "I,BB"),
 	MAPS_CHECK(87, "[II]"),
 	CLAN_STATE(88, "B,I"),
-	CLAN_INFO(89, "AI", ClanInfo.class),
+	CLAN_INFO(89, "AI"),
 	CLAN_APPLICATION(90, "[II]"),
-	CLAN_BALANCE(91, "II", ClanBalance.class),
+	CLAN_BALANCE(91, "II"),
 	CLAN_TRANSACTION(92, "[IBIIII]"),
-	CLAN_MEMBERS(93, "I[I]", ClanMembers.class),
+	CLAN_MEMBERS(93, "I[I]"),
 	CLAN_PRIVATE_ROOMS(94, "[IBBBW]"),
 	CLAN_JOIN(95, "I,I"),
 	CLAN_LEAVE(96, "I"),
@@ -118,24 +118,32 @@ public enum ServerParser
 
 		for (ServerParser packet : ServerParser.values())
 			ServerParser._server.put(packet.id(), packet);
+
+		HELLO.setSpecialize(Hello.class);
+		GUARD.setSpecialize(Guard.class);
+		LOGIN.setSpecialize(Login.class);
+		INFO.setSpecialize(PlayerInfo.class);
+		INFO_NET.setSpecialize(PlayerInfo.class);
+		CHAT_MESSAGE.setSpecialize(ChatMessage.class);
+		CLAN_INFO.setSpecialize(ClanInfo.class);
+		CLAN_BALANCE.setSpecialize(ClanBalance.class);
+		CLAN_MEMBERS.setSpecialize(ClanMembers.class);
 	}
 
 	private short id;
 	private String mask;
 	private Class specialize;
 
-	ServerParser(int id, String mask, Class specialize)
-	{
-		this.id = (short) id;
-		this.mask = mask;
-		this.specialize = specialize;
-	}
-
 	ServerParser(int id, String mask)
 	{
 		this.id = (short) id;
 		this.mask = mask;
 		this.specialize = null;
+	}
+
+	private void setSpecialize(Class specializer)
+	{
+		this.specialize = specializer;
 	}
 
 	public short id()
