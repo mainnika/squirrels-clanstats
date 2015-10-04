@@ -15,12 +15,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
 
-public class ChatBot
+public class ChatBot implements DeferredRequests.DeferredWaiter<Player>
 {
 	public enum ChatType
 	{
@@ -31,14 +28,21 @@ public class ChatBot
 	}
 
 	Analytics owner;
+	HashSet<Integer> requests;
 
 	ChatBot(Analytics owner)
 	{
 		this.owner = owner;
+		this.requests = new HashSet<>();
 	}
 
-	public void request(String command) throws IOException
+	public void request(String[] args) throws IOException
 	{
+		if (args.length == 0)
+			return;
+
+		String command = args[0];
+
 		switch (command)
 		{
 			case "hello":
@@ -57,10 +61,25 @@ public class ChatBot
 				stats();
 				break;
 
+			case "whois":
+				whois(args);
+				break;
+
 			default:
 				error();
 				break;
 		}
+	}
+
+	@Override
+	public void onRequest(int requestId, Player response)
+	{
+		if (!this.requests.remove(requestId))
+		{
+			return;
+		}
+
+		this.owner.clanChat("[whois]: ID" + response.id() + " = " + response.name() + " (" + response.profile() + ")");
 	}
 
 	private void hello() throws IOException
@@ -78,6 +97,34 @@ public class ChatBot
 		{
 			this.owner.clanChat(line);
 		}
+	}
+
+	private void whois(String[] args) throws IOException
+	{
+		if (args.length <= 1)
+		{
+			error();
+			return;
+		}
+
+		for (int i = 1; i < args.length; i++)
+		{
+			String arg = args[i];
+
+			int playerId = 0;
+
+			try
+			{
+				playerId = Integer.parseInt(arg);
+			} catch (NumberFormatException err)
+			{
+				continue;
+			}
+
+			int requestId = this.owner.getPlayerDeferred(playerId);
+			this.requests.add(requestId);
+		}
+
 	}
 
 	private void stats() throws IOException

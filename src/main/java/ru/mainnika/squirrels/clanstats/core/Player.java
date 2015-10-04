@@ -3,7 +3,7 @@ package ru.mainnika.squirrels.clanstats.core;
 import ru.mainnika.squirrels.clanstats.net.packets.server.PlayerInfo;
 import ru.mainnika.squirrels.clanstats.utils.DateTime;
 
-public class Player
+public class Player implements DeferredRequests.DeferredObject
 {
 	private Integer id;
 	private Long netId;
@@ -23,6 +23,12 @@ public class Player
 
 	private Player()
 	{
+	}
+
+	@Override
+	public int getDeferredId()
+	{
+		return this.id;
 	}
 
 	public int id()

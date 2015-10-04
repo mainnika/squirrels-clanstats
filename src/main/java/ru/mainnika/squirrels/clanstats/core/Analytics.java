@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-public class Analytics extends Receiver implements Timers.Task
+public class Analytics extends Receiver implements Timers.Task, DeferredRequests.DeferredRequirer
 {
 	private static final Logger log;
 
@@ -30,13 +30,17 @@ public class Analytics extends Receiver implements Timers.Task
 	private Credentials credentials;
 	private Player player;
 	private Clan clan;
+	private DeferredRequests deferredPlayers;
 
 	public Analytics(Connection connection, Credentials credentials)
 	{
 		super(connection);
 
 		this.credentials = credentials;
+		this.deferredPlayers = new DeferredRequests(this);
 		this.chatBot = new ChatBot(this);
+
+		this.deferredPlayers.addWaiter(this.chatBot);
 	}
 
 	public void onConnect()
@@ -107,10 +111,15 @@ public class Analytics extends Receiver implements Timers.Task
 
 			int clanId = element.clanId();
 
-			if (clanId == 0)
-				continue;
+			if (clanId > 0)
+			{
+				this.sendPacket(ClientParser.CLAN_REQUEST, Group.make(clanId), ClanInfo.FULL_MASK);
+			}
 
-			this.sendPacket(ClientParser.CLAN_REQUEST, Group.make(clanId), ClanInfo.FULL_MASK);
+			if (packet.isFull())
+			{
+				this.deferredPlayers.flow(players[i]);
+			}
 		}
 
 		if (players.length == 0)
@@ -186,7 +195,8 @@ public class Analytics extends Receiver implements Timers.Task
 		if (message.charAt(0) != '/')
 			return;
 
-		this.chatBot.request(message.substring(1));
+		String[] arguments = message.substring(1).split(" ");
+		this.chatBot.request(arguments);
 	}
 
 	public void playerReceived(Player player)
@@ -241,6 +251,17 @@ public class Analytics extends Receiver implements Timers.Task
 		{
 			this.sendPacket(ClientParser.CLAN_GET_MEMBERS, uid);
 		}
+	}
+
+	public int getPlayerDeferred(int playerId)
+	{
+		return this.deferredPlayers.addRequest(playerId);
+	}
+
+	@Override
+	public void deferredRequire(int waitingId)
+	{
+		this.requestPlayers(waitingId);
 	}
 
 	public void clanChat(String message)
