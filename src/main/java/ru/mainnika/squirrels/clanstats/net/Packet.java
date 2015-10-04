@@ -4,6 +4,8 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.BufferOverflowException;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
@@ -75,8 +77,9 @@ public class Packet extends Group
 		{
 			packet = (Packet) specialize.getConstructor(String.class, ByteBuffer.class).newInstance(format, buffer);
 			packet.id = id;
-		} catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException ignored)
+		} catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException err)
 		{
+			log.warning(err.getMessage());
 		}
 
 		return packet;
@@ -101,103 +104,103 @@ public class Packet extends Group
 	public static Group parser(String format, ByteBuffer raw, int groupLen, boolean optional)
 	{
 		Group result = new Group();
-
-		while (groupLen-- > 0)
+		try
 		{
-			Group groupElement = new Group();
-			int formatOffset = 0;
-
-			while (formatOffset < format.length())
+			while (groupLen-- > 0)
 			{
-				char symbol = format.charAt(formatOffset++);
+				Group groupElement = new Group();
+				int formatOffset = 0;
 
-				if (raw.position() >= raw.capacity() && optional)
-					break;
-
-				switch (symbol)
+				while (formatOffset < format.length())
 				{
-					case '[':
-					{
-						int next = findClosingBracket(format, formatOffset);
-						int subGroupLen = raw.getInt();
-						String subMask = format.substring(formatOffset, next);
+					char symbol = format.charAt(formatOffset++);
 
-						groupElement.add(parser(subMask, raw, subGroupLen, optional));
+					if (raw.position() >= raw.capacity() && optional)
+						break;
 
-						formatOffset = next + 1;
-						break;
-					}
-					case 'B':
+					switch (symbol)
 					{
-						Byte element = raw.get();
-						groupElement.add(element);
-						break;
-					}
-					case 'W':
-					{
-						Short element = raw.getShort();
-						groupElement.add(element);
-						break;
-					}
-					case 'I':
-					{
-						Integer element = raw.getInt();
-						groupElement.add(element);
-						break;
-					}
-					case 'L':
-					{
-						Long element = raw.getLong();
-						groupElement.add(element);
-						break;
-					}
-					case 'S':
-					{
-						short stringLen = raw.getShort();
-
-						if (stringLen == 0)
+						case '[':
 						{
-							groupElement.add("");
+							int next = findClosingBracket(format, formatOffset);
+							int subGroupLen = raw.getInt();
+							String subMask = format.substring(formatOffset, next);
+
+							groupElement.add(parser(subMask, raw, subGroupLen, optional));
+
+							formatOffset = next + 1;
 							break;
 						}
-
-						byte[] stringRaw = new byte[stringLen];
-
-						raw.get(stringRaw, 0, stringLen);
-						raw.position(raw.position() + 1);
-
-						String element = new String(stringRaw, StandardCharsets.UTF_8);
-
-						groupElement.add(element);
-						break;
-					}
-					case 'A':
-					{
-						int bufLen = raw.getInt();
-
-						if (bufLen == 0)
+						case 'B':
 						{
-							groupElement.add(new byte[0]);
+							Byte element = raw.get();
+							groupElement.add(element);
 							break;
 						}
+						case 'W':
+						{
+							Short element = raw.getShort();
+							groupElement.add(element);
+							break;
+						}
+						case 'I':
+						{
+							Integer element = raw.getInt();
+							groupElement.add(element);
+							break;
+						}
+						case 'L':
+						{
+							Long element = raw.getLong();
+							groupElement.add(element);
+							break;
+						}
+						case 'S':
+						{
+							short stringLen = raw.getShort();
 
-						byte[] bytesRaw = new byte[bufLen];
+							byte[] stringRaw = new byte[stringLen];
 
-						raw.get(bytesRaw, 0, bufLen);
+							raw.get(stringRaw, 0, stringLen);
+							raw.position(raw.position() + 1);
 
-						groupElement.add(bytesRaw);
-						break;
+							String element = new String(stringRaw, StandardCharsets.UTF_8);
+
+							groupElement.add(element);
+							break;
+						}
+						case 'A':
+						{
+							int bufLen = raw.getInt();
+
+							if (bufLen == 0)
+							{
+								groupElement.add(new byte[0]);
+								break;
+							}
+
+							byte[] bytesRaw = new byte[bufLen];
+
+							raw.get(bytesRaw, 0, bufLen);
+
+							groupElement.add(bytesRaw);
+							break;
+						}
+						case ',':
+							optional = true;
+							break;
+						default:
+							log.warning("Unknown symbol in mask (" + symbol + ")");
+							break;
 					}
-					case ',':
-						optional = true;
-						break;
-					default:
-						log.warning("Unknown symbol in mask (" + symbol + ")");
-						break;
 				}
+
+				result.add(groupElement);
 			}
 
-			result.add(groupElement);
+		} catch (BufferUnderflowException | BufferOverflowException err)
+		{
+			log.warning("Parsing failed: " + err.getMessage());
 		}
 
 		return result;

@@ -12,7 +12,7 @@ import javax.servlet.ServletContextListener;
 public class Main implements ServletContextListener
 {
 	public static final String VERSION_MAJ = "0";
-	public static final String VERSION_MIN = "31";
+	public static final String VERSION_MIN = "32";
 
 	private Connection net;
 	private Credentials cred;
