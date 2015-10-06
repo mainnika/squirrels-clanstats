@@ -1,23 +1,22 @@
-package ru.mainnika.squirrels.clanstats.api;
+package ru.mainnika.squirrels.clanstats.http.api;
 
+import ru.mainnika.squirrels.clanstats.http.ApiException;
+import ru.mainnika.squirrels.clanstats.http.CommonMethod;
 import ru.mainnika.squirrels.clanstats.utils.DateTime;
 
-import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class Hello extends HttpServlet
+public class Hello extends CommonMethod
 {
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
+	protected void doMethod(HttpServletRequest req, HttpServletResponse res) throws ApiException, IOException
 	{
-		ServletOutputStream out = resp.getOutputStream();
+		ServletOutputStream out = res.getOutputStream();
 
 		String result = String.format("{\"method\":\"hello\", \"timestamp\": %d}", DateTime.getUnixtime());
-
 		out.print(result);
 	}
 }

@@ -12,17 +12,17 @@
 
     <servlet>
         <servlet-name>Hello</servlet-name>
-        <servlet-class>ru.mainnika.squirrels.clanstats.api.Hello</servlet-class>
+        <servlet-class>ru.mainnika.squirrels.clanstats.http.api.Hello</servlet-class>
     </servlet>
 
     <servlet>
         <servlet-name>Ping</servlet-name>
-        <servlet-class>ru.mainnika.squirrels.clanstats.api.Ping</servlet-class>
+        <servlet-class>ru.mainnika.squirrels.clanstats.http.api.Ping</servlet-class>
     </servlet>
 
     <servlet>
         <servlet-name>Test</servlet-name>
-        <servlet-class>ru.mainnika.squirrels.clanstats.api.Test</servlet-class>
+        <servlet-class>ru.mainnika.squirrels.clanstats.http.api.Test</servlet-class>
     </servlet>
 
     <servlet-mapping>
