@@ -1,22 +1,19 @@
 package ru.mainnika.squirrels.clanstats.http.api;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import ru.mainnika.squirrels.clanstats.http.ApiException;
-import ru.mainnika.squirrels.clanstats.http.CommonMethod;
-import ru.mainnika.squirrels.clanstats.utils.DateTime;
+import ru.mainnika.squirrels.clanstats.http.CommonJsonMethod;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class Hello extends CommonMethod
+public class Hello extends CommonJsonMethod
 {
 	@Override
-	protected void doMethod(HttpServletRequest req, HttpServletResponse res) throws ApiException, IOException
+	protected void doMethod(HttpServletRequest req, HttpJsonResponse res) throws ApiException, JSONException, IOException
 	{
-		ServletOutputStream out = res.getOutputStream();
-
-		String result = String.format("{\"method\":\"hello\", \"timestamp\": %d}", DateTime.getUnixtime());
-		out.print(result);
+		JSONObject result = new JSONObject();
+		res.sendJson(result);
 	}
 }

@@ -1,7 +1,7 @@
 <component name="ArtifactManager">
   <artifact type="war" build-on-make="true" name="squirrels-clanstats:war">
     <output-path>$PROJECT_DIR$/target</output-path>
-    <root id="archive" name="ROOT.war">
+    <root id="archive" name="sqclanstats-1.0.war">
       <element id="artifact" artifact-name="squirrels-clanstats:war exploded" />
     </root>
   </artifact>

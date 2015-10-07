@@ -1,26 +1,21 @@
 package ru.mainnika.squirrels.clanstats.http.api;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import ru.mainnika.squirrels.clanstats.http.ApiException;
-import ru.mainnika.squirrels.clanstats.http.SecuredMethod;
+import ru.mainnika.squirrels.clanstats.http.SecuredJsonMethod;
 import ru.mainnika.squirrels.clanstats.storage.Database;
-import ru.mainnika.squirrels.clanstats.utils.DateTime;
 
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 
-public class Test extends SecuredMethod
+public class Test extends SecuredJsonMethod
 {
 	@Override
-	protected void doMethod(HttpServletRequest req, HttpServletResponse res) throws ApiException, IOException
+	protected void doMethod(HttpServletRequest req, HttpJsonResponse res) throws ApiException, JSONException, IOException
 	{
-		ServletOutputStream out = res.getOutputStream();
-
 		int count = 0;
 
 		try
@@ -36,8 +31,11 @@ public class Test extends SecuredMethod
 			throw new ApiException();
 		}
 
-		String result = String.format("{\"method\":\"test\", \"timestamp\": %d, \"result\": %d}", DateTime.getUnixtime(), count);
+		JSONObject result = new JSONObject();
+
+		result.put("result", count);
+
 		res.addCookie(new Cookie("foo", "bar"));
-		out.print(result);
+		res.sendJson(result);
 	}
 }
