@@ -7,4 +7,12 @@
         <Host>localhost</Host>
         <Port>3306</Port>
     </Storage>
+
+    <Social>
+        <VK>
+            <id>1</id>
+            <secure>foobar</secure>
+            <redirect>http://127.0.0.1/auth/vk/complete</redirect>
+        </VK>
+    </Social>
 </Config>
