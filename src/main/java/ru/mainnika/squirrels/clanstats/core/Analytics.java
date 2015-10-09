@@ -96,7 +96,7 @@ public class Analytics extends Receiver implements Timers.Task, DeferredRequests
 			this.sendPacket(ClientParser.GUARD, response);
 		}
 
-		this.sendPacket(ClientParser.LOGIN, this.credentials.uid(), this.credentials.type(), this.credentials.auth(), 0, 0);
+		this.sendPacket(ClientParser.LOGIN, this.credentials.uid(), this.credentials.oauth(), this.credentials.type(), this.credentials.auth(), 0, 0);
 	}
 
 	public void onPacket(PlayerInfo packet)
