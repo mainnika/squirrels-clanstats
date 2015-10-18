@@ -10,52 +10,35 @@
         <listener-class>ru.mainnika.squirrels.clanstats.Main</listener-class>
     </listener>
 
-
     <servlet>
         <servlet-name>Hello</servlet-name>
-        <servlet-class>ru.mainnika.squirrels.clanstats.api.methods.Hello</servlet-class>
+        <servlet-class>ru.mainnika.squirrels.clanstats.api.Hello</servlet-class>
     </servlet>
+
+    <servlet>
+        <servlet-name>Ping</servlet-name>
+        <servlet-class>ru.mainnika.squirrels.clanstats.api.Ping</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>Test</servlet-name>
+        <servlet-class>ru.mainnika.squirrels.clanstats.api.Test</servlet-class>
+    </servlet>
+
     <servlet-mapping>
         <servlet-name>Hello</servlet-name>
         <url-pattern>/</url-pattern>
     </servlet-mapping>
-
-    <servlet>
-        <servlet-name>Ping</servlet-name>
-        <servlet-class>ru.mainnika.squirrels.clanstats.api.methods.Ping</servlet-class>
-    </servlet>
+    
     <servlet-mapping>
         <servlet-name>Ping</servlet-name>
         <url-pattern>/ping</url-pattern>
     </servlet-mapping>
 
-    <servlet>
-        <servlet-name>Test</servlet-name>
-        <servlet-class>ru.mainnika.squirrels.clanstats.api.methods.Test</servlet-class>
-    </servlet>
     <servlet-mapping>
         <servlet-name>Test</servlet-name>
         <url-pattern>/test</url-pattern>
     </servlet-mapping>
-
-    <servlet>
-        <servlet-name>Auth</servlet-name>
-        <servlet-class>ru.mainnika.squirrels.clanstats.api.methods.Auth</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>Auth</servlet-name>
-        <url-pattern>/auth/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>Debug</servlet-name>
-        <servlet-class>ru.mainnika.squirrels.clanstats.api.methods.Debug</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>Debug</servlet-name>
-        <url-pattern>/debug</url-pattern>
-    </servlet-mapping>
-
 
 </web-app>
 

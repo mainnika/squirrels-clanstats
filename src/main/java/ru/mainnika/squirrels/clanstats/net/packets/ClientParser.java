@@ -12,7 +12,7 @@ public enum ClientParser
 	ADMIN_MESSAGE(6, "S"),
 	ADMIN_CLEAR(7, "LB"),
 	HELLO(8, ""),
-	LOGIN(9, "LBBSII,S"),
+	LOGIN(9, "LBSII,S"),
 	PLAY(10, "B,B"),
 	PLAY_CANCEL(11, ""),
 	PLAY_WITH(12, "I"),
