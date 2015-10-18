@@ -2,7 +2,7 @@ package ru.mainnika.squirrels.clanstats.analytics;
 
 public enum Analytics
 {
-	CLAN_MEMBERS_HOURLY(0, new ClanMembersHourlyActivity());
+	CLAN_MEMBERS_HOURLY(0, new ClanMembersActivityHourly());
 
 	private final int type;
 	private final AnalyticSnapshot instance;

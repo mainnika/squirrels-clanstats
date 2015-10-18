@@ -6,14 +6,14 @@ import ru.mainnika.squirrels.clanstats.utils.DateTime;
 
 import java.util.*;
 
-public class ClanMembersHourlyActivity extends AnalyticSnapshot
+public class ClanMembersActivityHourly extends AnalyticSnapshot
 {
 	private TreeMap<Integer, HashSet<Snapshot>> snapshots;
 	private HashSet<Snapshot> unsaved;
 
-	public ClanMembersHourlyActivity()
+	public ClanMembersActivityHourly()
 	{
-		super("ClanMembersHourlyActivity");
+		super("ClanMembersActivityHourly");
 
 		this.snapshots = new TreeMap<>();
 		this.unsaved = new HashSet<>();
