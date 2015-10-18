@@ -14,6 +14,8 @@ import java.util.logging.Logger;
 
 public class Analytics extends Receiver implements Timers.Task, DeferredRequests.DeferredRequirer
 {
+	private static final int FORCE_RECONNECT_TIME = 15;
+
 	private static final Logger log;
 
 	static
@@ -25,6 +27,8 @@ public class Analytics extends Receiver implements Timers.Task, DeferredRequests
 
 	private int playerId;
 	private int clanId;
+
+	private int tick;
 
 	private ChatBot chatBot;
 	private Credentials credentials;
@@ -39,6 +43,8 @@ public class Analytics extends Receiver implements Timers.Task, DeferredRequests
 		this.credentials = credentials;
 		this.deferredPlayers = new DeferredRequests(this);
 		this.chatBot = new ChatBot(this);
+
+		this.tick = 0;
 
 		this.deferredPlayers.addWaiter(this.chatBot);
 	}
@@ -225,7 +231,16 @@ public class Analytics extends Receiver implements Timers.Task, DeferredRequests
 	@Override
 	public void onTimer()
 	{
-		log.info("Timer tick!");
+		log.info("Timer tick #" + this.tick);
+
+		this.tick++;
+
+		if (this.tick % Analytics.FORCE_RECONNECT_TIME == 0)
+		{
+			log.info("Force reconnect");
+			this.io.disconnect();
+			return;
+		}
 
 		if (this.clan != null)
 		{
