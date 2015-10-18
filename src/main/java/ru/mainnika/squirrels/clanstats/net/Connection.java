@@ -52,9 +52,14 @@ public class Connection implements Runnable
 		this.socket.connect(addr);
 	}
 
-	public void disconnect() throws IOException
+	public void disconnect()
 	{
-		this.socket.close();
+		try{
+			this.socket.close();
+		} catch (IOException err)
+		{
+			log.warning("Can't disconnect, error: " + err.getMessage());
+		}
 	}
 
 	private void parser(byte[] data)
