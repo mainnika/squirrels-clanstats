@@ -2,6 +2,7 @@ package ru.mainnika.squirrels.clanstats.storage;
 
 import ru.mainnika.squirrels.clanstats.analytics.AnalyticSnapshot;
 import ru.mainnika.squirrels.clanstats.analytics.AnalyticSnapshot.Snapshot;
+import ru.mainnika.squirrels.clanstats.analytics.Analytics;
 import ru.mainnika.squirrels.clanstats.utils.Config;
 
 import java.io.IOException;
@@ -102,12 +103,14 @@ public class Database
 		return result.getInt("count");
 	}
 
-	public void loadSnapshot(AnalyticSnapshot snapshot) throws SQLException
+	public void loadSnapshot(Analytics analytics) throws SQLException
 	{
-		String query = "SELECT `hash`, `type`, `id`, `data`, `value` FROM `snapshots` ORDER BY `hash`, `type`";
-		Statement statement = this.sql.createStatement();
+		String query = "SELECT `hash`, `type`, `id`, `data`, `value` FROM `snapshots` WHERE `type` = ? ORDER BY `hash`";
+		PreparedStatement statement = this.sql.prepareStatement(query);
 
-		ResultSet result = statement.executeQuery(query);
+		statement.setInt(1, analytics.type());
+
+		ResultSet result = statement.executeQuery();
 		ArrayList<Snapshot> snapshots = new ArrayList<>();
 
 		while (result.next())
@@ -123,7 +126,7 @@ public class Database
 			snapshots.add(element);
 		}
 
-		snapshot.setSnapshots(snapshots);
+		analytics.instance().setSnapshots(snapshots);
 	}
 
 	public void saveSnapshot(AnalyticSnapshot snapshot) throws SQLException

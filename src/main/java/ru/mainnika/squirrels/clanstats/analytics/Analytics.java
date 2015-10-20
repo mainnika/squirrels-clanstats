@@ -1,5 +1,7 @@
 package ru.mainnika.squirrels.clanstats.analytics;
 
+import ru.mainnika.squirrels.clanstats.storage.Database;
+
 public enum Analytics
 {
 	CLAN_MEMBERS_HOURLY(0, new ClanMembersActivityHourly());
@@ -11,6 +13,23 @@ public enum Analytics
 	{
 		this.type = type;
 		this.instance = instance;
+
+		Database.Guard guard = null;
+		Database base = null;
+		try
+		{
+			guard = new Database.Guard();
+			base = guard.get();
+
+			base.loadSnapshot(this);
+
+		} catch (Exception ignored)
+		{
+		} finally
+		{
+			if (guard != null)
+				guard.close();
+		}
 	}
 
 	public int type()
