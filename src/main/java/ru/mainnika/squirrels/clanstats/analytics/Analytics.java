@@ -4,7 +4,8 @@ import ru.mainnika.squirrels.clanstats.storage.Database;
 
 public enum Analytics
 {
-	CLAN_MEMBERS_HOURLY(0, new ClanMembersActivityHourly());
+	CLAN_MEMBERS_HOURLY(0, new ClanMembersActivityHourly()),
+	CLAN_BALANCE_HOURLY(1, new ClanBalanceHourly());
 
 	private final int type;
 	private final AnalyticSnapshot instance;

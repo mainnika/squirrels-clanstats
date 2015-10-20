@@ -75,7 +75,7 @@ public class Clan
 			return null;
 		}
 
-		return (HashMap) this.statsDaily.clone();
+		return (HashMap) this.statsDaily;
 	}
 
 	public String emblem()
