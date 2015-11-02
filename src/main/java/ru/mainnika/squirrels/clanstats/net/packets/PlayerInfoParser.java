@@ -33,7 +33,8 @@ public enum PlayerInfoParser
 	SHAMAN_EXP(1 << 21, "I", "shaman_exp"),
 	SHAMAN_SKILLS(1 << 22, "[BBB]", "shaman_skills"),
 	RATING_INFO(1 << 23, "III", "rating_info", 3),
-	RATING_HISTORY(1 << 24, "[WI]", "rating_history");
+	RATING_HISTORY(1 << 24, "[WI]", "rating_history"),
+	RATING_HOLIDAY(1 << 25, "I", "rating_holiday");
 
 	private Integer offset;
 	private String mask;
