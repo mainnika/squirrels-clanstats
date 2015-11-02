@@ -7,4 +7,16 @@
         <Host>localhost</Host>
         <Port>3306</Port>
     </Storage>
+
+    <Server>
+        <Ip>88.212.207.7</Ip>
+        <Port>22227</Port>
+        <Secret></Secret>
+    </Server>
+
+    <Account>
+        <Uid>8479389</Uid>
+        <Type>0</Type>
+        <Ķey>292e587617848804a15d6347ed80b1f6</Ķey>
+    </Account>
 </Config>

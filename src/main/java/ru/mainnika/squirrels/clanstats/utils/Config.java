@@ -16,6 +16,14 @@ public class Config
 	private static String dbHost;
 	private static String dbPort;
 
+	private static String serverIp;
+	private static String serverPort;
+	private static String serverSecret;
+
+	private static String accountUid;
+	private static String accountType;
+	private static String accountKey;
+
 	static
 	{
 		String dbBase = null;
@@ -23,6 +31,14 @@ public class Config
 		String dbPassword = null;
 		String dbHost = null;
 		String dbPort = null;
+
+		String serverIp = null;
+		String serverPort = null;
+		String serverSecret = null;
+
+		String accountUid = null;
+		String accountType = null;
+		String accountKey = null;
 
 		try
 		{
@@ -40,6 +56,16 @@ public class Config
 			dbHost = getTextValue(storage, "Host");
 			dbPort = getTextValue(storage, "Port");
 
+			Element server = (Element) config.getElementsByTagName("Server").item(0);
+			serverIp = getTextValue(server, "Ip");
+			serverPort = getTextValue(server, "Port");
+			serverSecret = getTextValue(server, "Secret");
+
+			Element account = (Element) config.getElementsByTagName("Server").item(0);
+			accountUid = getTextValue(account, "Uid");
+			accountType = getTextValue(account, "Type");
+			accountKey = getTextValue(account, "Key");
+
 		} catch (Exception e)
 		{
 			dbBase = "sqclanbase";
@@ -47,6 +73,14 @@ public class Config
 			dbPassword = "";
 			dbHost = "localhost";
 			dbPort = "3306";
+
+			serverIp = "88.212.207.7";
+			serverPort = "22227";
+			serverSecret = "";
+
+			accountUid = "8479389";
+			accountType = "0";
+			accountKey = "292e587617848804a15d6347ed80b1f6";
 		} finally
 		{
 			Config.dbBase = dbBase;
@@ -54,6 +88,14 @@ public class Config
 			Config.dbPassword = dbPassword;
 			Config.dbHost = dbHost;
 			Config.dbPort = dbPort;
+
+			Config.serverIp = serverIp;
+			Config.serverPort = serverPort;
+			Config.serverSecret = serverSecret;
+
+			Config.accountUid = accountUid;
+			Config.accountType = accountType;
+			Config.accountKey = accountKey;
 		}
 	}
 
@@ -87,5 +129,35 @@ public class Config
 			dbPort,
 			dbBase
 		);
+	}
+
+	public static String serverIp()
+	{
+		return serverIp;
+	}
+
+	public static int serverPort()
+	{
+		return Integer.parseInt(serverPort);
+	}
+
+	public static String serverSecret()
+	{
+		return serverSecret;
+	}
+
+	public static long accountUid()
+	{
+		return Long.parseLong(accountUid);
+	}
+
+	public static int accountType()
+	{
+		return Integer.parseInt(accountType);
+	}
+
+	public static String accountKey()
+	{
+		return accountKey;
 	}
 }

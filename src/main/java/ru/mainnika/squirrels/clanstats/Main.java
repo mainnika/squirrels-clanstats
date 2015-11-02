@@ -3,6 +3,7 @@ package ru.mainnika.squirrels.clanstats;
 import ru.mainnika.squirrels.clanstats.core.Analytics;
 import ru.mainnika.squirrels.clanstats.core.Credentials;
 import ru.mainnika.squirrels.clanstats.net.Connection;
+import ru.mainnika.squirrels.clanstats.utils.Config;
 import ru.mainnika.squirrels.clanstats.utils.Timers;
 import ru.mainnika.squirrels.clanstats.utils.UnIdleService;
 
@@ -12,7 +13,7 @@ import javax.servlet.ServletContextListener;
 public class Main implements ServletContextListener
 {
 	public static final String VERSION_MAJ = "0";
-	public static final String VERSION_MIN = "41";
+	public static final String VERSION_MIN = "42";
 
 	private Connection net;
 	private Credentials cred;
@@ -24,8 +25,8 @@ public class Main implements ServletContextListener
 		Timers.create();
 		UnIdleService.create();
 
-		this.net = Connection.create("88.212.207.7", 22236);
-		this.cred = new Credentials(8479389, 0, "292e587617848804a15d6347ed80b1f6");
+		this.net = Connection.create(Config.serverIp(), Config.serverPort());
+		this.cred = new Credentials(Config.accountUid(), Config.accountType(), Config.accountKey());
 		this.analytics = new Analytics(net, cred);
 
 		this.net.start();
