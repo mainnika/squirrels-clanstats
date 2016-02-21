@@ -1,9 +1,5 @@
 package ru.mainnika.squirrels.clanstats.net;
 
-import org.apache.commons.lang3.ArrayUtils;
-import ru.mainnika.squirrels.clanstats.net.packets.ClientParser;
-import ru.mainnika.squirrels.clanstats.net.packets.ServerParser;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,7 +8,6 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Arrays;
 import java.util.logging.Logger;
 
 public class Connection implements Runnable
@@ -32,7 +27,6 @@ public class Connection implements Runnable
 	private String host;
 	private Receiver receiver;
 	private int port;
-	private int id;
 
 	private InputStream input;
 	private OutputStream output;
@@ -47,14 +41,14 @@ public class Connection implements Runnable
 	{
 		InetSocketAddress addr = new InetSocketAddress(this.host, this.port);
 
-		this.id = 0;
 		this.socket = new Socket();
 		this.socket.connect(addr);
 	}
 
 	public void disconnect()
 	{
-		try{
+		try
+		{
 			this.socket.close();
 		} catch (IOException err)
 		{
@@ -62,40 +56,14 @@ public class Connection implements Runnable
 		}
 	}
 
-	private void parser(byte[] data)
+	private void incoming(byte[] data)
 	{
-		ByteBuffer wrapped_data = ByteBuffer.wrap(data);
-
-		wrapped_data.order(ByteOrder.LITTLE_ENDIAN);
-
-		short type = wrapped_data.getShort();
-
-		ServerParser format = ServerParser.getById(type);
-
-		if (format == null)
-		{
-			log.warning("Received unknown packet with type " + type);
-			return;
-		}
-
-		byte[] packetRaw = Arrays.copyOfRange(data, 2, data.length);
-
-		log.info("Received packet " + format);
-
-		Packet packet = Packet.make(format.mask(), format.id(), format.specialize(), packetRaw);
-
-		if (packet == null)
-		{
-			log.warning("Cannot parse handler for " + type);
-			return;
-		}
-
 		if (this.receiver == null)
 		{
 			return;
 		}
 
-		this.receiver.onPacket(packet);
+		this.receiver.onPacket(data);
 	}
 
 	private void receiver() throws IOException
@@ -147,7 +115,7 @@ public class Connection implements Runnable
 
 			if (received == expectation)
 			{
-				this.parser(out.toByteArray());
+				this.incoming(out.toByteArray());
 				out.reset();
 				expectation = 0;
 				received = 0;
@@ -160,21 +128,9 @@ public class Connection implements Runnable
 		throw new IOException("Disconnected");
 	}
 
-	public void send(ClientParser format, Object... args) throws IOException
+	public void send(byte[] data) throws IOException
 	{
-		Packet packet = Packet.make(format.mask(), format.id(), args);
-		Byte[] rawPacket = packet.getRaw();
-
-		ByteBuffer bufferPacket = ByteBuffer.allocate(4 + 4 + 2 + rawPacket.length);
-
-		bufferPacket.order(ByteOrder.LITTLE_ENDIAN);
-
-		bufferPacket.putInt(rawPacket.length + 4 + 2);
-		bufferPacket.putInt(this.id++);
-		bufferPacket.putShort((short) (int) format.id());
-		bufferPacket.put(ArrayUtils.toPrimitive(rawPacket));
-
-		this.output.write(bufferPacket.array());
+		this.output.write(data);
 		this.output.flush();
 	}
 
@@ -234,7 +190,6 @@ public class Connection implements Runnable
 		if (this.receiver != null)
 		{
 			this.receiver.onDisconnect();
-			this.receiver = null;
 		}
 
 		this.receiver = receiver;
