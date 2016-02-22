@@ -1,10 +1,13 @@
 package ru.mainnika.squirrels.clanstats.net;
 
-import ru.mainnika.squirrels.clanstats.net.packets.ClientParser;
-import ru.mainnika.squirrels.clanstats.net.packets.ServerParser;
+import ru.mainnika.squirrels.clanstats.net.packets.ClientPacket;
+import ru.mainnika.squirrels.clanstats.net.packets.Server;
+import ru.mainnika.squirrels.clanstats.net.packets.ServerPacket;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.logging.Logger;
 
 public abstract class Receiver
@@ -28,34 +31,49 @@ public abstract class Receiver
 
 	public abstract void onDisconnect();
 
-	public void onPacket(Packet packet)
+	public void onPacket(byte[] data)
 	{
-		short id = packet.getId();
-		ServerParser format = ServerParser.getById(id);
-		Class specialize = format.specialize();
+		ByteBuffer wrapped_data = ByteBuffer.wrap(data);
+		wrapped_data.order(ByteOrder.LITTLE_ENDIAN);
+
+		int id = wrapped_data.getShort();
+
+		Server format = Server.getById(id);
+
+		if (format == null)
+		{
+			log.warning("Received unknown packet with type " + id);
+			return;
+		}
+
 		Method method = null;
+		Class<ServerPacket> specialize = null;
+		ServerPacket packet = null;
 
 		try
 		{
+			specialize = format.specialize();
+			packet = specialize.getConstructor(ByteBuffer.class).newInstance(wrapped_data);
 			method = this.getClass().getMethod("onPacket", specialize);
-			method.invoke(this, packet);
-		} catch (Exception e)
-		{
-			if (method == null)
-			{
-				log.warning("No handler for packet " + format.toString());
-				return;
-			}
 
-			log.warning("Something wrong with handler " + method.toString() + "(" + e.getMessage() + ")");
+			method.invoke(this, packet);
+
+		} catch (NoSuchMethodException ignored)
+		{
+			log.warning("No handler for packet " + format.toString());
+
+		} catch (Exception other)
+		{
+			log.warning("Something wrong with handler (" + other.getMessage() + ")");
 		}
 	}
 
-	public void sendPacket(ClientParser format, Object... args)
+	public void sendPacket(ClientPacket packet)
 	{
 		try
 		{
-			this.io.send(format, args);
+			this.io.send(packet.build());
+
 		} catch (IOException e)
 		{
 			log.warning("IO error " + e.getMessage());
