@@ -50,6 +50,7 @@ public class Connection implements Runnable
 		try
 		{
 			this.socket.close();
+
 		} catch (IOException err)
 		{
 			log.warning("Can't disconnect, error: " + err.getMessage());

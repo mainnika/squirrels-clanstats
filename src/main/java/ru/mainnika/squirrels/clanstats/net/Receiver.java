@@ -32,7 +32,6 @@ public abstract class Receiver
 
 	public void sendPacket(ClientPacket packet)
 	{
-
 		byte[] raw = packet.build();
 
 		ByteBuffer data = ByteBuffer.allocate(4 + 4 + 2 + raw.length);
@@ -79,6 +78,8 @@ public abstract class Receiver
 			log.warning("Received unknown packet with type " + id);
 			return;
 		}
+
+		log.info("Received packet with type " + id);
 
 		Method method;
 		Class<ServerPacket> specialize;
