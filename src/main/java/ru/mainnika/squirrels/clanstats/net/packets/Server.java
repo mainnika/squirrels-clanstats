@@ -1,12 +1,14 @@
 package ru.mainnika.squirrels.clanstats.net.packets;
 
+import ru.mainnika.squirrels.clanstats.net.packets.server.Guard;
 import ru.mainnika.squirrels.clanstats.net.packets.server.Hello;
 
 import java.util.HashMap;
 
 public enum Server
 {
-	HELLO(1, Hello.class);
+	HELLO(1, Hello.class),
+	GUARD(2, Guard.class);
 
 	private static HashMap<Integer, Server> _server;
 

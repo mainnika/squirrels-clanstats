@@ -1,13 +1,16 @@
 package ru.mainnika.squirrels.clanstats.net.packets;
 
+import ru.mainnika.squirrels.clanstats.net.packets.client.Guard;
 import ru.mainnika.squirrels.clanstats.net.packets.client.Hello;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 public enum Client
 {
-	HELLO(9, Hello.class);
+	HELLO(9, Hello.class),
+	GUARD(30, Guard.class);
 
 	private static HashMap<Integer, Client> _client;
 
@@ -48,7 +51,7 @@ public enum Client
 		return Client._client.get(id);
 	}
 
-	public static int getIdByClass(Class specialize)
+	public static int getIdByClass(Class specialize) throws IOException
 	{
 		for (Map.Entry<Integer, Client> packet : Client._client.entrySet())
 		{
@@ -60,6 +63,6 @@ public enum Client
 			return packet.getKey();
 		}
 
-		return 0;
+		throw new IOException("Packet is not registered");
 	}
 }
