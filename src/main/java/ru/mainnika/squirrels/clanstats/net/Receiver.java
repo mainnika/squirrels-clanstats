@@ -1,5 +1,6 @@
 package ru.mainnika.squirrels.clanstats.net;
 
+import ru.mainnika.squirrels.clanstats.net.packets.Client;
 import ru.mainnika.squirrels.clanstats.net.packets.ClientPacket;
 import ru.mainnika.squirrels.clanstats.net.packets.Server;
 import ru.mainnika.squirrels.clanstats.net.packets.ServerPacket;
@@ -20,18 +21,51 @@ public abstract class Receiver
 	}
 
 	protected Connection io;
+	private int nextId;
 
 	public Receiver(Connection connection)
 	{
+		this.nextId = 0;
 		this.io = connection;
 		this.io.setReceiver(this);
 	}
 
-	public abstract void onConnect();
+	public void sendPacket(ClientPacket packet)
+	{
 
-	public abstract void onDisconnect();
+		byte[] raw = packet.build();
 
-	public void onPacket(byte[] data)
+		ByteBuffer data = ByteBuffer.allocate(4 + 4 + 2 + raw.length);
+
+		try
+		{
+			data.order(ByteOrder.LITTLE_ENDIAN);
+			data.putInt(4 + 2 + raw.length);
+			data.putInt(nextId);
+			data.putShort((short) Client.getIdByClass(packet.getClass()));
+			data.put(raw);
+
+			this.io.send(data.array());
+			nextId++;
+
+		} catch (IOException e)
+		{
+			log.warning("IO error " + e.getMessage());
+		}
+	}
+
+	protected void onDisconnect_impl()
+	{
+		this.onDisconnect();
+	}
+
+	protected void onConnect_impl()
+	{
+		this.nextId = 0;
+		this.onConnect();
+	}
+
+	protected void onPacket(byte[] data)
 	{
 		ByteBuffer wrapped_data = ByteBuffer.wrap(data);
 		wrapped_data.order(ByteOrder.LITTLE_ENDIAN);
@@ -46,9 +80,9 @@ public abstract class Receiver
 			return;
 		}
 
-		Method method = null;
-		Class<ServerPacket> specialize = null;
-		ServerPacket packet = null;
+		Method method;
+		Class<ServerPacket> specialize;
+		ServerPacket packet;
 
 		try
 		{
@@ -68,15 +102,7 @@ public abstract class Receiver
 		}
 	}
 
-	public void sendPacket(ClientPacket packet)
-	{
-		try
-		{
-			this.io.send(packet.build());
+	protected abstract void onConnect();
 
-		} catch (IOException e)
-		{
-			log.warning("IO error " + e.getMessage());
-		}
-	}
+	protected abstract void onDisconnect();
 }

@@ -151,7 +151,7 @@ public class Connection implements Runnable
 
 				if (this.receiver != null)
 				{
-					this.receiver.onConnect();
+					this.receiver.onConnect_impl();
 				}
 
 				this.receiver();
@@ -189,7 +189,7 @@ public class Connection implements Runnable
 	{
 		if (this.receiver != null)
 		{
-			this.receiver.onDisconnect();
+			this.receiver.onDisconnect_impl();
 		}
 
 		this.receiver = receiver;

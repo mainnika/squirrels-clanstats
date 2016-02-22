@@ -2,3 +2,4 @@
 lib/
 target/
 out/
+src/main/resources/config.xml
