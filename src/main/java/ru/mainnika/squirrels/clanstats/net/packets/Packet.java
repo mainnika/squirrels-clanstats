@@ -91,6 +91,12 @@ public class Packet
 
 			return this;
 		}
+
+		@Override
+		public Group<T> clone()
+		{
+			return (Group<T>) super.clone();
+		}
 	}
 
 

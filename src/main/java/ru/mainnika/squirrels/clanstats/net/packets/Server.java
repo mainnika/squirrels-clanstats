@@ -2,6 +2,7 @@ package ru.mainnika.squirrels.clanstats.net.packets;
 
 import ru.mainnika.squirrels.clanstats.net.packets.server.Guard;
 import ru.mainnika.squirrels.clanstats.net.packets.server.Hello;
+import ru.mainnika.squirrels.clanstats.net.packets.server.Info;
 import ru.mainnika.squirrels.clanstats.net.packets.server.Login;
 
 import java.util.HashMap;
@@ -10,7 +11,9 @@ public enum Server
 {
 	HELLO(1, Hello.class),
 	GUARD(2, Guard.class),
-	LOGIN(6, Login.class);
+	LOGIN(6, Login.class),
+	INFO(7, Info.class),
+	INFO_NET(8, Info.class);
 
 	private static HashMap<Integer, Server> _server;
 
