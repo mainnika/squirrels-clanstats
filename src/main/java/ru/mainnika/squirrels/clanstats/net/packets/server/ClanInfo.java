@@ -29,16 +29,16 @@ public class ClanInfo extends ServerPacket implements Packet.Readable
 	{
 		public class Info implements Readable
 		{
-			public String noname1;
-			public String photo;
-			public String emblem;
+			public String name;
+			public String emblemBig;
+			public String emblemSmall;
 
 			@Override
 			public Info read(ByteBuffer buffer)
 			{
-				this.noname1 = readS(buffer);
-				this.photo = readS(buffer);
-				this.emblem = readS(buffer);
+				this.name = readS(buffer);
+				this.emblemBig = readS(buffer);
+				this.emblemSmall = readS(buffer);
 
 				return this;
 			}
@@ -48,9 +48,9 @@ public class ClanInfo extends ServerPacket implements Packet.Readable
 			{
 				Info clone = new Info();
 
-				clone.noname1 = this.noname1;
-				clone.photo = this.photo;
-				clone.emblem = this.emblem;
+				clone.name = this.name;
+				clone.emblemBig = this.emblemBig;
+				clone.emblemSmall = this.emblemSmall;
 
 				return clone;
 			}

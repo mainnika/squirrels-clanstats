@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class Packet
 {
@@ -21,9 +22,14 @@ public class Packet
 		ByteBuffer build();
 	}
 
-	public static class Group<T> extends ArrayList<T> implements Readable
+	public static class Group<T> extends ArrayList<T> implements Readable, Buildable
 	{
 		private T defaultValue;
+
+		public Group(Collection<T> collection)
+		{
+			super(collection);
+		}
 
 		public Group(T defaultValue)
 		{
@@ -97,6 +103,65 @@ public class Packet
 			}
 
 			return this;
+		}
+
+		@Override
+		public ByteBuffer build()
+		{
+			int len = this.size();
+
+			ByteBuffer[] buffers = new ByteBuffer[len + 1];
+
+			buffers[0] = writeI(len);
+
+			while (len-- > 0)
+			{
+				T value = this.get(len);
+
+				if (value instanceof Byte)
+				{
+					buffers[len + 1] = writeB((Byte) value);
+					continue;
+				}
+				if (value instanceof Short)
+				{
+					buffers[len + 1] = writeW((Short) value);
+					continue;
+				}
+
+				if (value instanceof Integer)
+				{
+					buffers[len + 1] = writeI((Integer) value);
+					continue;
+				}
+
+				if (value instanceof Long)
+				{
+					buffers[len + 1] = writeL((Long) value);
+					continue;
+				}
+
+				if (value instanceof String)
+				{
+					buffers[len + 1] = writeS((String) value);
+					continue;
+				}
+
+				if (value instanceof byte[])
+				{
+					buffers[len + 1] = writeA((byte[]) value);
+					continue;
+				}
+
+				if (value instanceof Buildable)
+				{
+					Buildable element = (Buildable) value;
+					buffers[len + 1] = element.build();
+					continue;
+				}
+			}
+
+			return joinBuffers(buffers);
 		}
 
 		@Override
