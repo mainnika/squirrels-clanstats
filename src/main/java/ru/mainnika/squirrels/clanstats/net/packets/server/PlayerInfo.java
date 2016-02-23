@@ -5,7 +5,7 @@ import ru.mainnika.squirrels.clanstats.net.packets.ServerPacket;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-public class Info extends ServerPacket
+public class PlayerInfo extends ServerPacket
 {
 	static final int NET_ID = 1 << 0;
 	static final int TYPE = 1 << 1;
