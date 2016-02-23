@@ -2,6 +2,8 @@ package ru.mainnika.squirrels.clanstats.net.packets.client;
 
 import ru.mainnika.squirrels.clanstats.net.packets.ClientPacket;
 
+import java.nio.ByteBuffer;
+
 public class Hello extends ClientPacket
 {
 	public Hello()
@@ -9,8 +11,8 @@ public class Hello extends ClientPacket
 	}
 
 	@Override
-	public byte[] build()
+	public ByteBuffer build()
 	{
-		return new byte[0];
+		return ByteBuffer.wrap(EMPTY_BUFFER);
 	}
 }

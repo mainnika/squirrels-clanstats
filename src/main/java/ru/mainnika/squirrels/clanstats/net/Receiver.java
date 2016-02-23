@@ -1,9 +1,6 @@
 package ru.mainnika.squirrels.clanstats.net;
 
-import ru.mainnika.squirrels.clanstats.net.packets.Client;
-import ru.mainnika.squirrels.clanstats.net.packets.ClientPacket;
-import ru.mainnika.squirrels.clanstats.net.packets.Server;
-import ru.mainnika.squirrels.clanstats.net.packets.ServerPacket;
+import ru.mainnika.squirrels.clanstats.net.packets.*;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -32,19 +29,20 @@ public abstract class Receiver
 
 	public void sendPacket(ClientPacket packet)
 	{
-		byte[] raw = packet.build();
-
-		ByteBuffer data = ByteBuffer.allocate(4 + 4 + 2 + raw.length);
-
 		try
 		{
-			data.order(ByteOrder.LITTLE_ENDIAN);
-			data.putInt(4 + 2 + raw.length);
-			data.putInt(nextId);
-			data.putShort((short) Client.getIdByClass(packet.getClass()));
-			data.put(raw);
+			ByteBuffer data = packet.build();
+			ByteBuffer header = Packet.joinBuffers(
+				Packet.writeI(4 + 2 + data.capacity()),
+				Packet.writeI(nextId),
+				Packet.writeW((short) Client.getIdByClass(packet.getClass()))
+			);
 
-			this.io.send(data.array());
+			this.io.send(Packet.joinBuffers(
+				header,
+				data
+			));
+
 			nextId++;
 
 		} catch (IOException e)

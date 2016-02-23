@@ -36,9 +36,9 @@ public class Login extends ClientPacket
 	}
 
 	@Override
-	public byte[] build()
+	public ByteBuffer build()
 	{
-		ByteBuffer data = joinBuffers(
+		return joinBuffers(
 			writeL(this.netId),
 			writeB(this.netType),
 			writeB(this.isOauth),
@@ -49,7 +49,5 @@ public class Login extends ClientPacket
 //                      optional:
 			writeS(this.sessionKey)
 		);
-
-		return data.array();
 	}
 }

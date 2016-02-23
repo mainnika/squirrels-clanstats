@@ -1,8 +1,6 @@
 package ru.mainnika.squirrels.clanstats.net.packets;
 
-abstract public class ClientPacket extends Packet
+abstract public class ClientPacket extends Packet implements Packet.Buildable
 {
-	public abstract byte[] build();
-
 
 }

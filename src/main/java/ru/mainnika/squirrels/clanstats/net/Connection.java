@@ -135,6 +135,12 @@ public class Connection implements Runnable
 		this.output.flush();
 	}
 
+	public void send(ByteBuffer buffer) throws IOException
+	{
+		this.output.write(buffer.array());
+		this.output.flush();
+	}
+
 	public void run()
 	{
 		while (true)

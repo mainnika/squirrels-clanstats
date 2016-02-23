@@ -7,11 +7,18 @@ import java.util.ArrayList;
 
 public class Packet
 {
+	public static final byte[] EMPTY_BUFFER = new byte[0];
+
 	public interface Readable extends Cloneable
 	{
 		Readable read(ByteBuffer buffer);
 
 		Object clone();
+	}
+
+	public interface Buildable
+	{
+		ByteBuffer build();
 	}
 
 	public static class Group<T> extends ArrayList<T> implements Readable

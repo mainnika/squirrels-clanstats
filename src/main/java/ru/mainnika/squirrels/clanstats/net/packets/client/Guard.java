@@ -14,12 +14,10 @@ public class Guard extends ClientPacket
 	}
 
 	@Override
-	public byte[] build()
+	public ByteBuffer build()
 	{
-		ByteBuffer data = joinBuffers(
+		return joinBuffers(
 			writeS(this.guardResponse)
 		);
-
-		return data.array();
 	}
 }
