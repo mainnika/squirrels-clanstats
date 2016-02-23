@@ -2,22 +2,17 @@ package ru.mainnika.squirrels.clanstats.net.packets.server;
 
 import ru.mainnika.squirrels.clanstats.net.packets.ServerPacket;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 public class Guard extends ServerPacket
 {
-	private byte[] data;
+	public byte[] task;
 
-	public Guard(ByteBuffer buffer) throws IOException
+	@Override
+	public Readable read(ByteBuffer buffer)
 	{
-		super();
+		this.task = readA(buffer);
 
-		this.data = readA(buffer);
-	}
-
-	public byte[] getInflatedTask()
-	{
-		return this.data;
+		return this;
 	}
 }

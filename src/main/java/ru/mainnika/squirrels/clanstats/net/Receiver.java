@@ -88,9 +88,10 @@ public abstract class Receiver
 		try
 		{
 			specialize = format.specialize();
-			packet = specialize.getConstructor(ByteBuffer.class).newInstance(wrapped_data);
+			packet = specialize.getConstructor().newInstance();
 			method = this.getClass().getMethod("onPacket", specialize);
 
+			packet.read(wrapped_data);
 			method.invoke(this, packet);
 
 		} catch (NoSuchMethodException ignored)

@@ -1,5 +1,10 @@
 package ru.mainnika.squirrels.clanstats.net.packets;
 
-public class ServerPacket extends Packet
+public abstract class ServerPacket extends Packet implements Packet.Readable
 {
+	@Override
+	public Object clone()
+	{
+		return null;
+	}
 }

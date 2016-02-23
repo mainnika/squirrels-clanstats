@@ -11,7 +11,8 @@ import java.util.Map;
 public enum Client
 {
 	HELLO(9, Hello.class),
-	GUARD(30, Guard.class);
+	GUARD(30, Guard.class),
+	LOGIN(10, Login.class);
 
 	private static HashMap<Integer, Client> _client;
 
