@@ -79,23 +79,23 @@ public class ChatBot implements DeferredRequests.DeferredWaiter<Player>
 			return;
 		}
 
-		this.owner.clanChat("[whois]: ID" + response.id() + " = " + response.name() + " (" + response.profile() + ")");
+//		this.owner.clanChat("[whois]: ID" + response.id() + " = " + response.name() + " (" + response.profile() + ")");
 	}
 
 	private void hello() throws IOException
 	{
-		this.owner.clanChat("[hello]: hello!");
+//		this.owner.clanChat("[hello]: hello!");
 	}
 
 	private void debug() throws IOException
 	{
 		String[] debugs = Main.getVersion().split("\n");
 
-		this.owner.clanChat("[debug]:");
+//		this.owner.clanChat("[debug]:");
 
 		for (String line : debugs)
 		{
-			this.owner.clanChat(line);
+//			this.owner.clanChat(line);
 		}
 	}
 
@@ -220,6 +220,4 @@ public class ChatBot implements DeferredRequests.DeferredWaiter<Player>
 		String picture = (String) ((NativeObject) ((NativeArray) object).get(0)).get("preview");
 		this.owner.clanChat(String.format("<img&#0;src='' height='100' width='100' src='%s%s' >", "//proxypass.azurewebsites.net/?http://media.oboobs.ru/", picture));
 	}
-
-
 }
