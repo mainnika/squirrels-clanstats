@@ -21,9 +21,9 @@ public enum Server
 	}
 
 	private int id;
-	private Class specialize;
+	private Class<? extends ServerPacket> specialize;
 
-	Server(int id, Class specialize)
+	Server(int id, Class<? extends ServerPacket> specialize)
 	{
 		this.id = id;
 		this.specialize = specialize;
@@ -34,7 +34,7 @@ public enum Server
 		return this.id;
 	}
 
-	public Class specialize()
+	public Class<? extends ServerPacket> specialize()
 	{
 		return this.specialize;
 	}

@@ -2,6 +2,7 @@ package ru.mainnika.squirrels.clanstats.net.packets;
 
 import ru.mainnika.squirrels.clanstats.net.packets.client.Guard;
 import ru.mainnika.squirrels.clanstats.net.packets.client.Hello;
+import ru.mainnika.squirrels.clanstats.net.packets.client.Login;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -23,9 +24,9 @@ public enum Client
 	}
 
 	private int id;
-	private Class specialize;
+	private Class<? extends ClientPacket> specialize;
 
-	Client(int id, Class mask)
+	Client(int id, Class<? extends ClientPacket> mask)
 	{
 		this.id = id;
 		this.specialize = mask;
@@ -36,7 +37,7 @@ public enum Client
 		return this.id;
 	}
 
-	public Class specialize()
+	public Class<? extends ClientPacket> specialize()
 	{
 		return this.specialize;
 	}
@@ -51,7 +52,7 @@ public enum Client
 		return Client._client.get(id);
 	}
 
-	public static int getIdByClass(Class specialize) throws IOException
+	public static int getIdByClass(Class<? extends ClientPacket> specialize) throws IOException
 	{
 		for (Map.Entry<Integer, Client> packet : Client._client.entrySet())
 		{

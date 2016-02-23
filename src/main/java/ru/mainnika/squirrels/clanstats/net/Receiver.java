@@ -82,7 +82,7 @@ public abstract class Receiver
 		log.info("Received packet with type " + id);
 
 		Method method;
-		Class<ServerPacket> specialize;
+		Class<? extends ServerPacket> specialize;
 		ServerPacket packet;
 
 		try
