@@ -1,24 +1,20 @@
 package ru.mainnika.squirrels.clanstats.net.packets.server;
 
-import ru.mainnika.squirrels.clanstats.net.Packet;
+import ru.mainnika.squirrels.clanstats.net.packets.ServerPacket;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
-public class ClanBalance extends Packet
+public class ClanBalance extends ServerPacket
 {
-	public ClanBalance(String format, ByteBuffer buffer) throws IOException
-	{
-		super(parser(format, buffer, 1, false).getGroup(0));
-	}
+	public Integer coins;
+	public Integer nuts;
 
-	public int coins()
+	@Override
+	public ClanBalance read(ByteBuffer buffer)
 	{
-		return this.getInt(0);
-	}
+		this.coins = readI(buffer);
+		this.nuts = readI(buffer);
 
-	public int nuts()
-	{
-		return this.getInt(1);
+		return this;
 	}
 }

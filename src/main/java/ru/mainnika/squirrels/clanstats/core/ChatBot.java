@@ -82,6 +82,11 @@ public class ChatBot implements DeferredRequests.DeferredWaiter<Player>
 		this.owner.clanChat("[whois]: ID" + response.id() + " = " + response.name() + " (" + response.profile() + ")");
 	}
 
+	public void greeter()
+	{
+		this.owner.clanChat("ChatBot instantiated, version " + Main.VERSION_MAJ + "." + Main.VERSION_MIN);
+	}
+
 	private void hello() throws IOException
 	{
 		this.owner.clanChat("[hello]: hello!");
@@ -220,6 +225,4 @@ public class ChatBot implements DeferredRequests.DeferredWaiter<Player>
 		String picture = (String) ((NativeObject) ((NativeArray) object).get(0)).get("preview");
 		this.owner.clanChat(String.format("<img&#0;src='' height='100' width='100' src='%s%s' >", "//proxypass.azurewebsites.net/?http://media.oboobs.ru/", picture));
 	}
-
-
 }

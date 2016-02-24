@@ -4,14 +4,14 @@ public class Credentials
 {
 	private long uid;
 	private byte type;
-	private byte oauth;
+	private boolean oauth;
 	private String auth;
 
 	public Credentials(long uid, int type, String auth)
 	{
 		this.uid = uid;
 		this.type = (byte) type;
-		this.oauth = 0;
+		this.oauth = false;
 		this.auth = auth;
 	}
 
@@ -25,7 +25,7 @@ public class Credentials
 		return this.type;
 	}
 
-	public byte oauth()
+	public boolean oauth()
 	{
 		return this.oauth;
 	}

@@ -1,10 +1,11 @@
 package ru.mainnika.squirrels.clanstats.core;
 
+import org.apache.commons.lang3.ArrayUtils;
 import ru.mainnika.squirrels.clanstats.net.Connection;
-import ru.mainnika.squirrels.clanstats.net.Group;
 import ru.mainnika.squirrels.clanstats.net.Receiver;
-import ru.mainnika.squirrels.clanstats.net.packets.ClientParser;
-import ru.mainnika.squirrels.clanstats.net.packets.server.*;
+import ru.mainnika.squirrels.clanstats.net.packets.Packet;
+import ru.mainnika.squirrels.clanstats.net.packets.client.*;
+import ru.mainnika.squirrels.clanstats.net.packets.server.PlayerInfo;
 import ru.mainnika.squirrels.clanstats.utils.GuardSolver;
 import ru.mainnika.squirrels.clanstats.utils.Timers;
 
@@ -30,6 +31,8 @@ public class Analytics extends Receiver implements Timers.Task, DeferredRequests
 
 	private int tick;
 
+	private boolean loginFirstTime;
+
 	private ChatBot chatBot;
 	private Credentials credentials;
 	private Player player;
@@ -45,13 +48,14 @@ public class Analytics extends Receiver implements Timers.Task, DeferredRequests
 		this.chatBot = new ChatBot(this);
 
 		this.tick = 0;
+		this.loginFirstTime = true;
 
 		this.deferredPlayers.addWaiter(this.chatBot);
 	}
 
 	public void onConnect()
 	{
-		this.sendPacket(ClientParser.HELLO);
+		this.sendPacket(new Hello());
 	}
 
 	public void onDisconnect()
@@ -60,35 +64,16 @@ public class Analytics extends Receiver implements Timers.Task, DeferredRequests
 		this.player = null;
 	}
 
-	public void onPacket(Hello packet)
+	public void onPacket(ru.mainnika.squirrels.clanstats.net.packets.server.Hello packet)
 	{
 		log.info("HELLO");
 	}
 
-	public void onPacket(Login packet) throws IOException
-	{
-		byte status = packet.getStatus();
-
-		log.info("Received login with status " + status);
-
-		if (status != 0)
-		{
-			this.io.disconnect();
-			return;
-		}
-
-		this.playerId = packet.getPlayerId();
-
-		this.sendPacket(ClientParser.CHAT_ENTER);
-
-		Timers.subscribe(this, 1, 1, TimeUnit.MINUTES);
-	}
-
-	public void onPacket(Guard packet) throws IOException
+	public void onPacket(ru.mainnika.squirrels.clanstats.net.packets.server.Guard packet) throws IOException
 	{
 		log.info("Received guard");
 
-		byte[] inflatedRaw = packet.getInflatedTask();
+		byte[] inflatedRaw = packet.task;
 
 		if (inflatedRaw.length > 0)
 		{
@@ -99,27 +84,47 @@ public class Analytics extends Receiver implements Timers.Task, DeferredRequests
 
 			log.info("Guard response " + response);
 
-			this.sendPacket(ClientParser.GUARD, response);
+			this.sendPacket(new Guard(response));
 		}
 
-		this.sendPacket(ClientParser.LOGIN, this.credentials.uid(), this.credentials.oauth(), this.credentials.type(), this.credentials.auth(), 0, 0);
+		this.sendPacket(new Login(credentials.uid(), credentials.type(), credentials.oauth(), credentials.auth(), 0, 0));
 	}
 
-	public void onPacket(PlayerInfo packet)
+	public void onPacket(ru.mainnika.squirrels.clanstats.net.packets.server.Login packet) throws IOException
 	{
-		int count = packet.count();
+		byte status = packet.status;
+
+		log.info("Received login with status " + status);
+
+		if (status != 0)
+		{
+			this.io.disconnect();
+			return;
+		}
+
+		this.playerId = packet.innerId;
+
+		this.sendPacket(new ChatEnter());
+		this.loginFirstTime();
+
+		Timers.subscribe(this, 1, 1, TimeUnit.MINUTES);
+	}
+
+	public void onPacket(ru.mainnika.squirrels.clanstats.net.packets.server.PlayerInfo packet)
+	{
+		int count = packet.players.size();
 		Player[] players = new Player[count];
 
 		for (int i = 0; i < count; i++)
 		{
-			PlayerInfo.Info element = packet.getInfoElement(i);
-			players[i] = Player.createFromInfo(element);
+			PlayerInfo.Player player = packet.players.get(i);
+			players[i] = Player.createFromInfo(player);
 
-			int clanId = element.clanId();
+			int clanId = player.clanId;
 
 			if (clanId > 0)
 			{
-				this.sendPacket(ClientParser.CLAN_REQUEST, Group.make(clanId), ClanInfo.FULL_MASK);
+				this.sendPacket(new ClanRequest(-1, clanId));
 			}
 
 			if (packet.isFull())
@@ -136,15 +141,14 @@ public class Analytics extends Receiver implements Timers.Task, DeferredRequests
 		PlayersCache.getInstance().put(players);
 	}
 
-	public void onPacket(ClanInfo packet)
+	public void onPacket(ru.mainnika.squirrels.clanstats.net.packets.server.ClanInfo packet)
 	{
-		int count = packet.count();
+		int count = packet.clans.size();
 		Clan[] clans = new Clan[count];
 
 		for (int i = 0; i < count; i++)
 		{
-			ClanInfo.Info element = packet.getInfoElement(i);
-			clans[i] = Clan.createFromInfo(element);
+			clans[i] = Clan.createFromInfo(packet.clans.get(i));
 		}
 
 		if (clans.length == 0)
@@ -155,45 +159,40 @@ public class Analytics extends Receiver implements Timers.Task, DeferredRequests
 		ClansCache.getInstance().put(clans);
 	}
 
-	public void onPacket(ClanBalance packet)
+	public void onPacket(ru.mainnika.squirrels.clanstats.net.packets.server.ClanBalance packet)
 	{
 		if (this.clan == null)
 		{
 			return;
 		}
 
-		int coins = packet.coins();
-		int nuts = packet.nuts();
+		int coins = packet.coins;
+		int nuts = packet.nuts;
 
 		this.clan.setBalance(coins, nuts);
 	}
 
-	public void onPacket(ClanMembers packet)
+	public void onPacket(ru.mainnika.squirrels.clanstats.net.packets.server.ClanMembers packet)
 	{
-		Clan clan = ClansCache.getInstance().get(packet.clanId());
+		Clan clan = ClansCache.getInstance().get(packet.clanId);
 
 		if (clan == null)
 		{
 			return;
 		}
 
-		Group players = packet.members();
-		int[] playersForRequest = new int[players.size()];
+		Packet.Group<Integer> players = packet.members;
 
-		for (int i = 0; i < players.size(); i++)
-		{
-			playersForRequest[i] = players.getGroup(i).getInt(0);
-		}
+		this.requestPlayers(ArrayUtils.toPrimitive(players.toArray(new Integer[players.size()])));
 
-		this.requestPlayers(playersForRequest);
 		clan.setPlayers(players);
 	}
 
-	public void onPacket(ChatMessage packet) throws IOException
+	public void onPacket(ru.mainnika.squirrels.clanstats.net.packets.server.ChatMessage packet) throws IOException
 	{
-		ChatBot.ChatType chatType = ChatBot.ChatType.values()[packet.chatType()];
-		int playerId = packet.playerId();
-		String message = packet.message();
+		ChatBot.ChatType chatType = ChatBot.ChatType.values()[packet.chatType];
+		int playerId = packet.senderId;
+		String message = packet.message;
 
 		if (chatType != ChatBot.ChatType.CLAN)
 			return;
@@ -248,23 +247,23 @@ public class Analytics extends Receiver implements Timers.Task, DeferredRequests
 		}
 	}
 
-	public void requestPlayers(byte type, long... nid)
+	public void requestPlayers(byte type, long... nids)
 	{
-		this.sendPacket(ClientParser.REQUEST_NET, Group.make(nid), type, PlayerInfo.FULL_MASK);
+		this.sendPacket(new PlayerRequestNet(-1, type, ArrayUtils.toObject(nids)));
 	}
 
 	public void requestPlayers(int... uids)
 	{
-		this.sendPacket(ClientParser.REQUEST, Group.make(uids), PlayerInfo.FULL_MASK);
+		this.sendPacket(new PlayerRequest(-1, ArrayUtils.toObject(uids)));
 	}
 
 	public void requestClans(int... uids)
 	{
-		this.sendPacket(ClientParser.CLAN_REQUEST, Group.make(uids), ClanInfo.FULL_MASK);
+		this.sendPacket(new ClanRequest(-1, ArrayUtils.toObject(uids)));
 
 		for (int uid : uids)
 		{
-			this.sendPacket(ClientParser.CLAN_GET_MEMBERS, uid);
+			this.sendPacket(new ClanGetMembers(uid));
 		}
 	}
 
@@ -281,7 +280,19 @@ public class Analytics extends Receiver implements Timers.Task, DeferredRequests
 
 	public void clanChat(String message)
 	{
-		this.sendPacket(ClientParser.CHAT_MESSAGE, (byte) 1, message);
+		this.sendPacket(new ChatMessage((byte) 1, message));
+	}
+
+	public void loginFirstTime()
+	{
+		if (!loginFirstTime)
+		{
+			return;
+		}
+
+		this.loginFirstTime = false;
+
+		this.chatBot.greeter();
 	}
 
 	public int clanId()

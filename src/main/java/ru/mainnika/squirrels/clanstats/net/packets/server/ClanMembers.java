@@ -1,25 +1,20 @@
 package ru.mainnika.squirrels.clanstats.net.packets.server;
 
-import ru.mainnika.squirrels.clanstats.net.Group;
-import ru.mainnika.squirrels.clanstats.net.Packet;
+import ru.mainnika.squirrels.clanstats.net.packets.ServerPacket;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
-public class ClanMembers extends Packet
+public class ClanMembers extends ServerPacket
 {
-	public ClanMembers(String format, ByteBuffer buffer) throws IOException
-	{
-		super(parser(format, buffer, 1, false).getGroup(0));
-	}
+	public Integer clanId;
+	public Group<Integer> members;
 
-	public int clanId()
+	@Override
+	public ClanMembers read(ByteBuffer buffer)
 	{
-		return this.getInt(0);
-	}
+		this.clanId = readI(buffer);
+		this.members = new Group<>((int) 0).read(buffer);
 
-	public Group members()
-	{
-		return this.getGroup(1);
+		return this;
 	}
 }
