@@ -73,7 +73,7 @@ public abstract class Receiver
 
 		if (format == null)
 		{
-			log.warning("Received unknown packet with type " + id);
+//			log.warning("Received unknown packet with type " + id);
 			return;
 		}
 

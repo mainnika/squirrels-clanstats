@@ -7,7 +7,7 @@ import java.nio.ByteOrder;
 
 public class PlayerInfo extends ServerPacket
 {
-	static final int NET_ID = 1 << 0;
+	static final int NET_ID = 1;
 	static final int TYPE = 1 << 1;
 	static final int MODERATOR = 1 << 2;
 	static final int NAME = 1 << 3;
@@ -86,8 +86,8 @@ public class PlayerInfo extends ServerPacket
 			{
 				Weared clone = new Weared();
 
-				clone.weared1 = (Group<Short>) this.weared1.clone();
-				clone.weared2 = (Group<Short>) this.weared2.clone();
+				clone.weared1 = this.weared1.clone();
+				clone.weared2 = this.weared2.clone();
 
 				return clone;
 			}
@@ -179,14 +179,14 @@ public class PlayerInfo extends ServerPacket
 
 		public class RatingHistory implements Readable
 		{
-			public Byte noname1;
-			public Byte noname2;
+			public Short noname1;
+			public Integer noname2;
 
 			@Override
 			public RatingHistory read(ByteBuffer buffer)
 			{
-				this.noname1 = readB(buffer);
-				this.noname2 = readB(buffer);
+				this.noname1 = readW(buffer);
+				this.noname2 = readI(buffer);
 
 				return this;
 			}
@@ -203,14 +203,14 @@ public class PlayerInfo extends ServerPacket
 			}
 		}
 
-		public class Trophies implements Readable
+		public class Trophy implements Readable
 		{
 			public Byte noname1;
 			public Short noname2;
 			public Byte noname3;
 
 			@Override
-			public Trophies read(ByteBuffer buffer)
+			public Trophy read(ByteBuffer buffer)
 			{
 				this.noname1 = readB(buffer);
 				this.noname2 = readW(buffer);
@@ -220,9 +220,9 @@ public class PlayerInfo extends ServerPacket
 			}
 
 			@Override
-			public Trophies clone()
+			public Trophy clone()
 			{
-				Trophies clone = new Trophies();
+				Trophy clone = new Trophy();
 
 				clone.noname1 = this.noname1;
 				clone.noname2 = this.noname2;
@@ -256,7 +256,7 @@ public class PlayerInfo extends ServerPacket
 		public RatingInfo ratingInfo;
 		public Group<RatingHistory> ratingHistories;
 		public Integer ratingHoliday;
-		public Trophies trophies;
+		public Group<Trophy> trophies;
 
 		public Player(int mask)
 		{
@@ -270,7 +270,7 @@ public class PlayerInfo extends ServerPacket
 			this.shamanSkills = new Group<>(new ShamanSkill());
 			this.ratingInfo = new RatingInfo();
 			this.ratingHistories = new Group<>(new RatingHistory());
-			this.trophies = new Trophies();
+			this.trophies = new Group<>(new Trophy());
 		}
 
 		@Override
@@ -342,7 +342,7 @@ public class PlayerInfo extends ServerPacket
 				this.ratingHoliday = readI(buffer);
 
 			if ((mask & TROPHIES) > 0)
-				this.trophies = new Trophies().read(buffer);
+				this.trophies = new Group<>(new Trophy()).read(buffer);
 
 			return this;
 		}
@@ -360,21 +360,21 @@ public class PlayerInfo extends ServerPacket
 			clone.gender = this.gender;
 			clone.photo = this.photo;
 			clone.online = this.online;
-			clone.personInfo = (PersonInfo) this.personInfo.clone();
+			clone.personInfo = this.personInfo.clone();
 			clone.experience = this.experience;
-			clone.weared = (Weared) this.weared.clone();
+			clone.weared = this.weared.clone();
 			clone.clanId = this.clanId;
-			clone.collectionExchange = (Group<Byte>) this.collectionExchange.clone();
+			clone.collectionExchange = this.collectionExchange.clone();
 			clone.isGone = this.isGone;
 			clone.clanTotem = this.clanTotem;
-			clone.vip = (Vip) this.vip.clone();
-			clone.interior = (Group<Byte>) this.interior.clone();
+			clone.vip = this.vip.clone();
+			clone.interior = this.interior.clone();
 			clone.shamanExp = this.shamanExp;
-			clone.shamanSkills = (Group<ShamanSkill>) this.shamanSkills.clone();
-			clone.ratingInfo = (RatingInfo) this.ratingInfo.clone();
-			clone.ratingHistories = (Group<RatingHistory>) this.ratingHistories.clone();
+			clone.shamanSkills = this.shamanSkills.clone();
+			clone.ratingInfo = this.ratingInfo.clone();
+			clone.ratingHistories = this.ratingHistories.clone();
 			clone.ratingHoliday = this.ratingHoliday;
-			clone.trophies = (Trophies) this.trophies.clone();
+			clone.trophies = this.trophies.clone();
 
 			return clone;
 		}

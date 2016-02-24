@@ -79,23 +79,28 @@ public class ChatBot implements DeferredRequests.DeferredWaiter<Player>
 			return;
 		}
 
-//		this.owner.clanChat("[whois]: ID" + response.id() + " = " + response.name() + " (" + response.profile() + ")");
+		this.owner.clanChat("[whois]: ID" + response.id() + " = " + response.name() + " (" + response.profile() + ")");
+	}
+
+	public void greeter()
+	{
+		this.owner.clanChat("ChatBot instantiated, version " + Main.VERSION_MAJ + "." + Main.VERSION_MIN);
 	}
 
 	private void hello() throws IOException
 	{
-//		this.owner.clanChat("[hello]: hello!");
+		this.owner.clanChat("[hello]: hello!");
 	}
 
 	private void debug() throws IOException
 	{
 		String[] debugs = Main.getVersion().split("\n");
 
-//		this.owner.clanChat("[debug]:");
+		this.owner.clanChat("[debug]:");
 
 		for (String line : debugs)
 		{
-//			this.owner.clanChat(line);
+			this.owner.clanChat(line);
 		}
 	}
 

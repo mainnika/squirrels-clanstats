@@ -91,12 +91,7 @@ public class Clan
 
 	public void setPlayers(Packet.Group<Integer> players)
 	{
-		this.players = new ArrayList<>(players.size());
-
-		for (Integer playerId : players)
-		{
-			this.players.add(playerId);
-		}
+		this.players = players;
 	}
 
 	public void fromOther(Clan other)
@@ -129,9 +124,9 @@ public class Clan
 		clan.level = info.rank.level;
 		clan.experience = info.rank.experience;
 
-		clan.name = info.info.noname1;
-		clan.photo = info.info.photo;
-		clan.emblem = info.info.emblem;
+		clan.name = info.info.name;
+		clan.photo = info.info.emblemBig;
+		clan.emblem = info.info.emblemSmall;
 
 		clan.statsDaily = new HashMap<>();
 		Packet.Group<ClanInfo.Clan.Statisic> stats = info.statisics;
@@ -140,7 +135,7 @@ public class Clan
 			clan.statsDaily.put(stat.innerId, new AbstractMap.SimpleEntry<>(stat.clanExp, stat.playerExp));
 		}
 
-//		ru.mainnika.squirrels.clanstats.analytics.Analytics.CLAN_MEMBERS_HOURLY.instance().add(clan);
+		ru.mainnika.squirrels.clanstats.analytics.Analytics.CLAN_MEMBERS_HOURLY.instance().add(clan);
 
 		return clan;
 	}

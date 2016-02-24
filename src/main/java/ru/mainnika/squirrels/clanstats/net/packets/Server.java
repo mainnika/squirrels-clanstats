@@ -11,7 +11,10 @@ public enum Server
 	LOGIN(6, Login.class),
 	INFO(7, PlayerInfo.class),
 	INFO_NET(8, PlayerInfo.class),
-	CLAN_INFO(101, ClanInfo.class);
+	CHAT_MESSAGE(57, ChatMessage.class),
+	CLAN_INFO(101, ClanInfo.class),
+	CLAN_BALANCE(103, ClanBalance.class),
+	CLAN_MEMBERS(105, ClanMembers.class);
 
 	private static HashMap<Integer, Server> _server;
 

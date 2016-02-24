@@ -1,8 +1,6 @@
 package ru.mainnika.squirrels.clanstats.net.packets;
 
-import ru.mainnika.squirrels.clanstats.net.packets.client.Guard;
-import ru.mainnika.squirrels.clanstats.net.packets.client.Hello;
-import ru.mainnika.squirrels.clanstats.net.packets.client.Login;
+import ru.mainnika.squirrels.clanstats.net.packets.client.*;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -11,8 +9,14 @@ import java.util.Map;
 public enum Client
 {
 	HELLO(9, Hello.class),
+	LOGIN(10, Login.class),
+	REQUEST(17, PlayerRequest.class),
+	REQUEST_NET(18, PlayerRequestNet.class),
 	GUARD(30, Guard.class),
-	LOGIN(10, Login.class);
+	CHAT_MESSAGE(53, ChatMessage.class),
+	CLAN_REQUEST(101, ClanRequest.class),
+	CLAN_GET_MEMBERS(106, ClanGetMembers.class),
+	CHAT_ENTER(108, ChatEnter.class);
 
 	private static HashMap<Integer, Client> _client;
 
