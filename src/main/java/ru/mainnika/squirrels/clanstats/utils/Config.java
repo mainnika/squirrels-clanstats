@@ -61,7 +61,7 @@ public class Config
 			serverPort = getTextValue(server, "Port");
 			serverSecret = getTextValue(server, "Secret");
 
-			Element account = (Element) config.getElementsByTagName("Server").item(0);
+			Element account = (Element) config.getElementsByTagName("Account").item(0);
 			accountUid = getTextValue(account, "Uid");
 			accountType = getTextValue(account, "Type");
 			accountKey = getTextValue(account, "Key");

@@ -12,7 +12,6 @@ public class Player implements DeferredRequests.DeferredObject
 	private String photo;
 	private String profile;
 	private Boolean isModerator;
-	private Boolean isEditor;
 	private Boolean isOnline;
 	private Boolean isVip;
 	private Integer squirrelExperience;
@@ -66,11 +65,6 @@ public class Player implements DeferredRequests.DeferredObject
 		return this.isModerator;
 	}
 
-	public boolean isEditor()
-	{
-		return this.isEditor;
-	}
-
 	public boolean isOnline()
 	{
 		return this.isOnline;
@@ -101,56 +95,52 @@ public class Player implements DeferredRequests.DeferredObject
 		return this.updated;
 	}
 
-	public void updateFromInfo(PlayerInfo.Info info)
+	public void updateFromInfo(PlayerInfo.Player info)
 	{
-		if (this.id() != info.id())
+		if (this.id() != info.innerId)
 			return;
 
-		Long netId = info.netId();
+		Long netId = info.netId;
 		if (netId != null)
 			this.netId = netId;
 
-		Byte netType = info.netType();
+		Byte netType = info.netType;
 		if (netType != null)
 			this.netType = netType;
 
-		String name = info.name();
+		String name = info.name;
 		if (name != null)
 			this.name = name;
 
-		String photo = info.photo();
+		String photo = info.photo;
 		if (photo != null)
 			this.photo = photo;
 
-		String profile = info.profile();
+		String profile = info.personInfo.profile;
 		if (profile != null)
 			this.profile = profile;
 
-		Boolean isModerator = info.isModerator();
+		Boolean isModerator = info.moderator == null ? null : info.moderator > 0;
 		if (isModerator != null)
 			this.isModerator = isModerator;
 
-		Boolean isEditor = info.isEditor();
-		if (isEditor != null)
-			this.isEditor = isEditor;
-
-		Boolean isOnline = info.isOnline();
+		Boolean isOnline = info.online == null ? null : info.online > 0;
 		if (isOnline != null)
 			this.isOnline = isOnline;
 
-		Boolean isVip = info.isVip();
+		Boolean isVip = info.vip == null ? null : (info.vip.isVip > 0);
 		if (isVip != null)
 			this.isVip = isVip;
 
-		Integer squirrelExperience = info.squirrelExperience();
+		Integer squirrelExperience = info.experience;
 		if (squirrelExperience != null)
 			this.squirrelExperience = squirrelExperience;
 
-		Integer shamanExperience = info.shamanExperience();
+		Integer shamanExperience = info.shamanExp;
 		if (shamanExperience != null)
 			this.shamanExperience = shamanExperience;
 
-		Integer clanId = info.clanId();
+		Integer clanId = info.clanId;
 		if (clanId != null)
 			this.clanId = clanId;
 
@@ -186,10 +176,6 @@ public class Player implements DeferredRequests.DeferredObject
 		if (isModerator != null)
 			this.isModerator = isModerator;
 
-		Boolean isEditor = player.isEditor;
-		if (isEditor != null)
-			this.isEditor = isEditor;
-
 		Boolean isOnline = player.isOnline;
 		if (isOnline != null)
 			this.isOnline = isOnline;
@@ -213,24 +199,23 @@ public class Player implements DeferredRequests.DeferredObject
 		this.updated = DateTime.getUnixtime();
 	}
 
-	public static Player createFromInfo(PlayerInfo.Info info)
+	public static Player createFromInfo(PlayerInfo.Player info)
 	{
 		Player player = new Player();
 
-		player.id = info.id();
+		player.id = info.innerId;
 
-		player.netId = info.netId();
-		player.netType = info.netType();
-		player.name = info.name();
-		player.photo = info.photo();
-		player.profile = info.profile();
-		player.isModerator = info.isModerator();
-		player.isEditor = info.isEditor();
-		player.isOnline = info.isOnline();
-		player.isVip = info.isVip();
-		player.squirrelExperience = info.squirrelExperience();
-		player.shamanExperience = info.shamanExperience();
-		player.clanId = info.clanId();
+		player.netId = info.netId;
+		player.netType = info.netType;
+		player.name = info.name;
+		player.photo = info.photo;
+		player.profile = info.personInfo.profile;
+		player.isModerator = info.moderator == null ? null : info.moderator > 0;
+		player.isOnline = info.online == null ? null : info.online > 0;
+		player.isVip = info.vip == null ? null : (info.vip.isVip > 0);
+		player.squirrelExperience = info.experience;
+		player.shamanExperience = info.shamanExp;
+		player.clanId = info.clanId;
 
 		player.updated = DateTime.getUnixtime();
 

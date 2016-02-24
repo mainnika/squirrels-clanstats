@@ -1,6 +1,6 @@
 package ru.mainnika.squirrels.clanstats.core;
 
-import ru.mainnika.squirrels.clanstats.net.Group;
+import ru.mainnika.squirrels.clanstats.net.packets.Packet;
 import ru.mainnika.squirrels.clanstats.net.packets.server.ClanInfo;
 
 import java.util.AbstractMap;
@@ -89,15 +89,9 @@ public class Clan
 		this.nuts = nuts;
 	}
 
-	public void setPlayers(Group players)
+	public void setPlayers(Packet.Group<Integer> players)
 	{
-		this.players = new ArrayList<>(players.size());
-
-		for (int i = 0; i < players.size(); i++)
-		{
-			Integer playerId = players.getGroup(i).getInt(0);
-			this.players.add(playerId);
-		}
+		this.players = players;
 	}
 
 	public void fromOther(Clan other)
@@ -121,25 +115,24 @@ public class Clan
 		}
 	}
 
-	public static Clan createFromInfo(ClanInfo.Info info)
+	public static Clan createFromInfo(ClanInfo.Clan info)
 	{
 		Clan clan = new Clan();
 
-		clan.id = info.id();
-		clan.leaderId = info.leaderId();
-		clan.level = info.level();
-		clan.experience = info.experience();
+		clan.id = info.clanId;
+		clan.leaderId = info.leaderId;
+		clan.level = info.rank.level;
+		clan.experience = info.rank.experience;
 
-		clan.name = info.name();
-		clan.photo = info.photo();
-		clan.emblem = info.emblem();
+		clan.name = info.info.name;
+		clan.photo = info.info.emblemBig;
+		clan.emblem = info.info.emblemSmall;
 
 		clan.statsDaily = new HashMap<>();
-		Group stats = info.stats();
-		for (int i = 0; i < stats.size(); i++)
+		Packet.Group<ClanInfo.Clan.Statisic> stats = info.statisics;
+		for (ClanInfo.Clan.Statisic stat : stats)
 		{
-			Group element = stats.getGroup(i);
-			clan.statsDaily.put(element.getInt(0), new AbstractMap.SimpleEntry<>(element.getInt(1), element.getInt(2)));
+			clan.statsDaily.put(stat.innerId, new AbstractMap.SimpleEntry<>(stat.clanExp, stat.playerExp));
 		}
 
 		ru.mainnika.squirrels.clanstats.analytics.Analytics.CLAN_MEMBERS_HOURLY.instance().add(clan);

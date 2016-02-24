@@ -1,29 +1,22 @@
 package ru.mainnika.squirrels.clanstats.net.packets.server;
 
-import ru.mainnika.squirrels.clanstats.net.Packet;
+import ru.mainnika.squirrels.clanstats.net.packets.ServerPacket;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
-public class ChatMessage extends Packet
+public class ChatMessage extends ServerPacket
 {
-	public ChatMessage(String format, ByteBuffer buffer) throws IOException
-	{
-		super(parser(format, buffer, 1, false).getGroup(0));
-	}
+	public Byte chatType;
+	public Integer senderId;
+	public String message;
 
-	public byte chatType()
+	@Override
+	public Readable read(ByteBuffer buffer)
 	{
-		return this.getByte(0);
-	}
+		this.chatType = readB(buffer);
+		this.senderId = readI(buffer);
+		this.message = readS(buffer);
 
-	public int playerId()
-	{
-		return this.getInt(1);
-	}
-
-	public String message()
-	{
-		return this.getString(2);
+		return this;
 	}
 }

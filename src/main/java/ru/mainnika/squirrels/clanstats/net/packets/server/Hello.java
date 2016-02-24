@@ -1,14 +1,14 @@
 package ru.mainnika.squirrels.clanstats.net.packets.server;
 
-import ru.mainnika.squirrels.clanstats.net.Packet;
+import ru.mainnika.squirrels.clanstats.net.packets.ServerPacket;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
-public class Hello extends Packet
+public class Hello extends ServerPacket
 {
-	public Hello(String format, ByteBuffer buffer) throws IOException
+	@Override
+	public Readable read(ByteBuffer buffer)
 	{
-		super(parser(format, buffer, 1, false).getGroup(0));
+		return this;
 	}
 }
