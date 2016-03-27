@@ -8,13 +8,13 @@ public enum Server
 {
 	HELLO(1, Hello.class),
 	GUARD(2, Guard.class),
-	LOGIN(6, Login.class),
-	INFO(7, PlayerInfo.class),
-	INFO_NET(8, PlayerInfo.class),
-	CHAT_MESSAGE(57, ChatMessage.class),
-	CLAN_INFO(101, ClanInfo.class),
-	CLAN_BALANCE(103, ClanBalance.class),
-	CLAN_MEMBERS(105, ClanMembers.class);
+	LOGIN(7, Login.class),
+	INFO(8, PlayerInfo.class),
+	INFO_NET(9, PlayerInfo.class),
+	CHAT_MESSAGE(58, ChatMessage.class),
+	CLAN_INFO(102, ClanInfo.class),
+	CLAN_BALANCE(104, ClanBalance.class),
+	CLAN_MEMBERS(106, ClanMembers.class);
 
 	private static HashMap<Integer, Server> _server;
 

@@ -8,15 +8,15 @@ import java.util.Map;
 
 public enum Client
 {
-	HELLO(9, Hello.class),
-	LOGIN(10, Login.class),
-	REQUEST(17, PlayerRequest.class),
-	REQUEST_NET(18, PlayerRequestNet.class),
-	GUARD(30, Guard.class),
-	CHAT_MESSAGE(53, ChatMessage.class),
-	CLAN_REQUEST(101, ClanRequest.class),
-	CLAN_GET_MEMBERS(106, ClanGetMembers.class),
-	CHAT_ENTER(108, ChatEnter.class);
+	HELLO(10, Hello.class),
+	LOGIN(11, Login.class),
+	REQUEST(18, PlayerRequest.class),
+	REQUEST_NET(19, PlayerRequestNet.class),
+	GUARD(31, Guard.class),
+	CHAT_MESSAGE(54, ChatMessage.class),
+	CLAN_REQUEST(102, ClanRequest.class),
+	CLAN_GET_MEMBERS(107, ClanGetMembers.class),
+	CHAT_ENTER(109, ChatEnter.class);
 
 	private static HashMap<Integer, Client> _client;
 
