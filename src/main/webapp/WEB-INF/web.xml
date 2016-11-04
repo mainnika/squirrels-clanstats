@@ -7,10 +7,10 @@
          metadata-complete="false">
 
     <listener>
-        <listener-class>ru.mainnika.squirrels.clanstats.Main</listener-class>
+        <listener-class>ru.mainnika.squirrels.urban.Main</listener-class>
     </listener>
 
-    <servlet>
+    <!--<servlet>
         <servlet-name>Hello</servlet-name>
         <servlet-class>ru.mainnika.squirrels.clanstats.api.Hello</servlet-class>
     </servlet>
@@ -23,13 +23,13 @@
     <servlet>
         <servlet-name>Test</servlet-name>
         <servlet-class>ru.mainnika.squirrels.clanstats.api.Test</servlet-class>
-    </servlet>
+    </servlet>-->
 
-    <servlet-mapping>
+    <!--<servlet-mapping>
         <servlet-name>Hello</servlet-name>
         <url-pattern>/</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
         <servlet-name>Ping</servlet-name>
         <url-pattern>/ping</url-pattern>
@@ -38,7 +38,7 @@
     <servlet-mapping>
         <servlet-name>Test</servlet-name>
         <url-pattern>/test</url-pattern>
-    </servlet-mapping>
+    </servlet-mapping>-->
 
 </web-app>
 

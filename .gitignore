@@ -3,3 +3,6 @@ lib/
 target/
 out/
 src/main/resources/config.xml
+.settings/
+.project
+.classpath
